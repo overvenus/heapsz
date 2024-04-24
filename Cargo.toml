@@ -1,0 +1,8 @@
+[workspace]
+resolver = "2"
+members = [
+    "heapuse",
+    "heapuse-derive",
+    "heapuse-example",
+    "heapuse-tests",
+]

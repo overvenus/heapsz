@@ -1,0 +1,16 @@
+[package]
+name = "heapuse-tests"
+version = "0.1.0"
+edition = "2021"
+license = "MIT"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+
+[dev-dependencies]
+heapuse = { path = "../heapuse" }
+heapuse-derive = { path = "../heapuse-derive" }
+heapuse-example = { path = "../heapuse-example" }
+
+trybuild = "1.0"

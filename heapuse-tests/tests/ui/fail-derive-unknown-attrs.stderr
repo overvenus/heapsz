@@ -1,0 +1,5 @@
+error: unknown heap attribute
+ --> tests/ui/fail-derive-unknown-attrs.rs:6:12
+  |
+6 |     #[heap(unknown)]
+  |            ^^^^^^^

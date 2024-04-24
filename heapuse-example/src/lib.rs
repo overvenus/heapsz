@@ -1,0 +1,92 @@
+macro_rules! decl_struct {
+    (
+        mod $mod_name: ident {
+            $(
+                struct $struct_name: ident {
+                    $(
+                        $field_name:ident : $field_type: ty,
+                    )*
+                }
+            )+
+        }
+    ) => {
+        pub mod $mod_name {
+            pub mod full { $(
+                #[derive(Default, Debug, heapuse_derive::Heap)]
+                pub struct $struct_name {
+                    $(
+                        #[heap(add)]
+                        pub $field_name : $field_type,
+                    )*
+                }
+            )+ }
+
+            pub mod none { $(
+                #[derive(Default, Debug, heapuse_derive::Heap)]
+                pub struct $struct_name {
+                    $(
+                        pub $field_name : $field_type,
+                    )*
+                }
+            )+ }
+
+            $(
+                pub use full::$struct_name;
+
+                #[allow(non_snake_case)]
+                #[test]
+                fn $struct_name() {
+                    use heapuse::HeapSize;
+                    let fs = full::$struct_name::default();
+                    assert_eq!(fs.approximate_heap_size(), 0);
+
+                    let ns = full::$struct_name::default();
+                    assert_eq!(ns.approximate_heap_size(), 0);
+                }
+            )+
+        }
+    }
+}
+
+decl_struct! {
+    mod primitive {
+        struct StructBool {
+            field_bool: bool,
+        }
+
+        struct StructPrimitives {
+            field_bool: bool,
+            field_u8: u8,
+            field_i8: i8,
+            field_u16: u16,
+            field_i16: i16,
+            field_u32: u32,
+            field_i32: i32,
+            field_u64: u64,
+            field_i64: i64,
+            field_u128: u128,
+            field_i128: i128,
+            field_usize: usize,
+            field_isize: isize,
+            field_f32: f32,
+            field_f64: f64,
+        }
+    }
+}
+
+decl_struct! {
+    mod container {
+        struct StructHeapMap {
+            field_map: std::collections::HashMap<usize, crate::primitive::StructBool>,
+        }
+
+        struct StructVec {
+            field_vec: Vec<crate::primitive::StructPrimitives>,
+        }
+
+        struct StructContainers {
+            field_vec: Vec<crate::primitive::StructPrimitives>,
+            field_map: std::collections::HashMap<usize, crate::primitive::StructBool>,
+        }
+    }
+}

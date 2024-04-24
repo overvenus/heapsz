@@ -1,0 +1,5 @@
+error: too many heap attribute
+ --> tests/ui/fail-derive-too-many-attrs-1.rs:6:7
+  |
+6 |     #[heap(add, add)]
+  |       ^^^^^^^^^^^^^^
