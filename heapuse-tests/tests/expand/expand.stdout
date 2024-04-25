@@ -442,3 +442,41 @@ pub mod container {
     pub use full::StructVec;
     pub use full::StructContainers;
 }
+pub mod with_attr {
+    use self::remote::Inner;
+    pub mod remote {
+        pub struct Inner(pub Box<u8>);
+        #[automatically_derived]
+        impl ::core::default::Default for Inner {
+            #[inline]
+            fn default() -> Inner {
+                Inner(::core::default::Default::default())
+            }
+        }
+    }
+    pub mod remote_inner_heap_size {
+        use heapuse::HeapSize;
+        use super::remote;
+        pub fn approximate_heap_size(t: &remote::Inner) -> usize {
+            t.0.approximate_heap_size()
+        }
+    }
+    pub struct Wtih {
+        #[heap(with = "remote_inner_heap_size")]
+        pub inner: Inner,
+    }
+    #[automatically_derived]
+    impl ::core::default::Default for Wtih {
+        #[inline]
+        fn default() -> Wtih {
+            Wtih {
+                inner: ::core::default::Default::default(),
+            }
+        }
+    }
+    impl ::heapuse::HeapSize for Wtih {
+        fn approximate_heap_size(&self) -> usize {
+            0 + remote_inner_heap_size::approximate_heap_size(&self.inner)
+        }
+    }
+}

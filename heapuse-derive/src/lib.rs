@@ -151,15 +151,16 @@ impl HeapField {
     }
 
     fn approximate_heap_size(&self) -> Result<TokenStream> {
+        let ident = &self.ident;
         match self.attr {
-            HeapAttr::Add(_) => {
-                let ident = &self.ident;
-                Ok(quote_spanned! {self.field.span()=>
-                    ::heapuse::HeapSize::approximate_heap_size(&self.#ident)
+            HeapAttr::Add(_) => Ok(quote_spanned! {self.field.span()=>
+                ::heapuse::HeapSize::approximate_heap_size(&self.#ident)
+            }),
+            HeapAttr::With(ref meta, ref mod_path) => {
+                let path = syn::parse_str::<syn::Path>(&mod_path.value())?;
+                Ok(quote_spanned! {meta.span()=>
+                    #path::approximate_heap_size(&self.#ident)
                 })
-            }
-            HeapAttr::With(_, ref mod_path) => {
-                unimplemented!("heap(with = \"{:?}\")", mod_path)
             }
             HeapAttr::All(ref meta) => {
                 bail!(meta, "`#[heap(all)]` is not allowed in field");
@@ -193,7 +194,6 @@ fn render_struct(input: DeriveInput) -> Result<proc_macro2::TokenStream> {
         } => Vec::new(),
     };
 
-    // fields and their name.
     let mut approximate_heap_sizes = vec![];
     for (i, field) in fields.into_iter().enumerate() {
         if let Some(f) = HeapField::new(i, field.clone(), container_attrs.as_ref())? {

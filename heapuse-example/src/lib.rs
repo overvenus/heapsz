@@ -103,3 +103,28 @@ decl_struct! {
         }
     }
 }
+
+pub mod with_attr {
+    use self::remote::Inner;
+
+    pub mod remote {
+        #[derive(Default)]
+        pub struct Inner(pub Box<u8>);
+    }
+
+    pub mod remote_inner_heap_size {
+        use heapuse::HeapSize;
+
+        use super::remote;
+
+        pub fn approximate_heap_size(t: &remote::Inner) -> usize {
+            t.0.approximate_heap_size()
+        }
+    }
+
+    #[derive(Default, heapuse_derive::Heap)]
+    pub struct Wtih {
+        #[heap(with = "remote_inner_heap_size")]
+        pub inner: Inner,
+    }
+}
