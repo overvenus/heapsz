@@ -25,4 +25,25 @@ pub struct G2<T: HeapSize> {
     pub a: Vec<T>,
 }
 
+#[derive(Heap)]
+pub struct M1<T: HeapSize> {
+    #[heap(add)]
+    #[cfg(test)]
+    pub a: Vec<T>,
+    #[heap(add)]
+    #[cfg(not(test))]
+    pub b: Vec<T>,
+    #[heap(add)]
+    #[cfg(not(test))]
+    pub c: Vec<T>,
+}
+
+#[derive(Heap)]
+#[heap(all)]
+pub struct A1<T: HeapSize> {
+    #[heap(add)]
+    pub a: Vec<T>,
+    pub b: Vec<T>,
+}
+
 fn main() {}

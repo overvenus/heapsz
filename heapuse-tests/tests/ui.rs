@@ -1,7 +1,7 @@
 use std::{fs::read_dir, path::Path};
 
 #[test]
-fn test() {
+fn ui() {
     let t = trybuild::TestCases::new();
 
     let ui_dir = Path::new("tests/ui");

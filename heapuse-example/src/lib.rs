@@ -12,7 +12,7 @@ macro_rules! decl_struct {
     ) => {
         pub mod $mod_name {
             pub mod full { $(
-                #[derive(Default, Debug, heapuse_derive::Heap)]
+                #[derive(Default, heapuse_derive::Heap)]
                 pub struct $struct_name {
                     $(
                         #[heap(add)]
@@ -22,7 +22,17 @@ macro_rules! decl_struct {
             )+ }
 
             pub mod none { $(
-                #[derive(Default, Debug, heapuse_derive::Heap)]
+                #[derive(Default, heapuse_derive::Heap)]
+                pub struct $struct_name {
+                    $(
+                        pub $field_name : $field_type,
+                    )*
+                }
+            )+ }
+
+            pub mod all { $(
+                #[derive(Default, heapuse_derive::Heap)]
+                #[heap(all)]
                 pub struct $struct_name {
                     $(
                         pub $field_name : $field_type,
@@ -40,7 +50,10 @@ macro_rules! decl_struct {
                     let fs = full::$struct_name::default();
                     assert_eq!(fs.approximate_heap_size(), 0);
 
-                    let ns = full::$struct_name::default();
+                    let ns = none::$struct_name::default();
+                    assert_eq!(ns.approximate_heap_size(), 0);
+
+                    let ns = all::$struct_name::default();
                     assert_eq!(ns.approximate_heap_size(), 0);
                 }
             )+

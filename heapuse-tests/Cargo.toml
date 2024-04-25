@@ -14,3 +14,4 @@ heapuse-derive = { path = "../heapuse-derive" }
 heapuse-example = { path = "../heapuse-example" }
 
 trybuild = "1.0"
+snapbox = { version = "0.5" }

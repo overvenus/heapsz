@@ -3,8 +3,9 @@ use std::result;
 use proc_macro2::{Span, TokenStream};
 use quote::{quote, quote_spanned, ToTokens};
 use syn::{
-    punctuated::Punctuated, spanned::Spanned, Data, DataStruct, DeriveInput, Expr, ExprLit, Field,
-    Fields, FieldsNamed, FieldsUnnamed, Index, Lit, LitStr, Meta, MetaNameValue, Token,
+    punctuated::Punctuated, spanned::Spanned, Attribute, Data, DataStruct, DeriveInput, Expr,
+    ExprLit, Field, Fields, FieldsNamed, FieldsUnnamed, Index, Lit, LitStr, Meta, MetaNameValue,
+    Token,
 };
 
 // #[heap(...)]
@@ -38,16 +39,45 @@ macro_rules! bail {
 }
 
 enum HeapAttr {
-    Add,
-    With(LitStr), // TODO: Calculate heap size using the specified mod path.
+    All(Meta),
+    Add(Meta),
+    With(Meta, LitStr), // TODO: Calculate heap size using the specified mod path.
 }
 
 impl HeapAttr {
-    fn new(meta: Meta) -> Result<Self> {
+    fn new<T: ToTokens>(raw_attrs: &[Attribute], origin: T) -> Result<Option<Self>> {
+        let mut attrs = vec![];
+        for attr in raw_attrs {
+            if let Meta::List(meta_list) = &attr.meta {
+                if meta_list.path.is_ident(HEAP_IDENT) {
+                    let heap_attrs = meta_list
+                        .parse_args_with(Punctuated::<Meta, Token![,]>::parse_terminated)?;
+                    if heap_attrs.len() > 1 {
+                        bail!(meta_list, "too many heap attributes");
+                    }
+                    attrs.extend(heap_attrs);
+                }
+            } else {
+                bail!(
+                    attr,
+                    "unsupported heap attribute, maybe you mean `#[heap(add)]`?"
+                );
+            }
+        }
+        let meta = if attrs.is_empty() {
+            return Ok(None);
+        } else if attrs.len() == 1 {
+            attrs.pop().unwrap()
+        } else {
+            bail!(origin, "too many heap attributes")
+        };
+
         match meta {
             Meta::Path(ref name) => {
                 if name.is_ident(HEAP_ATTR_ADD_IDENT) {
-                    Ok(HeapAttr::Add)
+                    Ok(Some(HeapAttr::Add(meta)))
+                } else if name.is_ident(HEAP_ATTR_ALL_IDENT) {
+                    Ok(Some(HeapAttr::All(meta)))
                 } else if name.is_ident(HEAP_ATTR_WITH_IDENT) {
                     bail!(
                         meta,
@@ -68,13 +98,15 @@ impl HeapAttr {
                     }),
                 ..
             }) => {
-                if path.is_ident(HEAP_ATTR_ADD_IDENT) {
+                if path.is_ident(HEAP_ATTR_WITH_IDENT) {
+                    Ok(Some(HeapAttr::With(meta.clone(), mod_path.clone())))
+                } else if path.is_ident(HEAP_ATTR_ADD_IDENT) || path.is_ident(HEAP_ATTR_ALL_IDENT) {
+                    let name = path.to_token_stream().to_string().replace(' ', "");
                     bail!(
                         meta,
-                        "heap attribute `add` is followed by an unexpected mod path"
+                        "heap attribute `{}` is followed by an unexpected mod path",
+                        name
                     )
-                } else if path.is_ident(HEAP_ATTR_WITH_IDENT) {
-                    Ok(HeapAttr::With(mod_path.clone()))
                 } else {
                     let name = path.to_token_stream().to_string().replace(' ', "");
                     bail!(meta, "unknown heap attribute `{}`", name)
@@ -95,33 +127,17 @@ struct HeapField {
 }
 
 impl HeapField {
-    fn new(index: usize, field: Field) -> Result<Option<Self>> {
-        let mut attrs = vec![];
-        for attr in &field.attrs {
-            if let Meta::List(meta_list) = &attr.meta {
-                if meta_list.path.is_ident(HEAP_IDENT) {
-                    let heap_attrs = meta_list
-                        .parse_args_with(Punctuated::<Meta, Token![,]>::parse_terminated)?;
-                    if heap_attrs.len() > 1 {
-                        bail!(meta_list, "too many heap attributes");
-                    }
-
-                    for m in heap_attrs {
-                        attrs.push(HeapAttr::new(m)?)
-                    }
+    fn new(index: usize, field: Field, container_attr: Option<&HeapAttr>) -> Result<Option<Self>> {
+        let attr = match HeapAttr::new(&field.attrs, &field)? {
+            Some(attr) => attr,
+            None => {
+                if let Some(HeapAttr::All(ref meta)) = container_attr {
+                    HeapAttr::Add(meta.clone())
+                } else {
+                    return Ok(None);
                 }
-            } else {
-                bail!(
-                    attr,
-                    "unsupported heap attribute, maybe you mean `#[heap(add)]`?"
-                );
             }
-        }
-        if attrs.is_empty() {
-            return Ok(None);
-        } else if attrs.len() > 1 {
-            bail!(field, "too many heap attributes")
-        }
+        };
 
         let ident = field.ident.clone().map(|x| quote!(#x)).unwrap_or_else(|| {
             let index = Index {
@@ -131,34 +147,34 @@ impl HeapField {
             quote!(#index)
         });
 
-        Ok(Some(HeapField {
-            attr: attrs.pop().unwrap(),
-            ident,
-            field,
-        }))
+        Ok(Some(HeapField { attr, ident, field }))
     }
 
-    fn approximate_heap_size(&self) -> TokenStream {
+    fn approximate_heap_size(&self) -> Result<TokenStream> {
         match self.attr {
-            HeapAttr::Add => {
+            HeapAttr::Add(_) => {
                 let ident = &self.ident;
-                quote_spanned! {self.field.span()=>
+                Ok(quote_spanned! {self.field.span()=>
                     ::heapuse::HeapSize::approximate_heap_size(&self.#ident)
-                }
+                })
             }
-            HeapAttr::With(ref mod_path) => {
+            HeapAttr::With(_, ref mod_path) => {
                 unimplemented!("heap(with = \"{:?}\")", mod_path)
+            }
+            HeapAttr::All(ref meta) => {
+                bail!(meta, "`#[heap(all)]` is not allowed in field");
             }
         }
     }
 }
 
 fn render_struct(input: DeriveInput) -> Result<proc_macro2::TokenStream> {
+    let container_attrs = HeapAttr::new(&input.attrs, &input)?;
+
     let ident = input.ident.clone();
     let Data::Struct(data) = input.data else {
         bail!(input, "{} should be a struct", ident);
     };
-
     let fields = match data {
         DataStruct {
             fields: Fields::Named(FieldsNamed { named: fields, .. }),
@@ -178,14 +194,12 @@ fn render_struct(input: DeriveInput) -> Result<proc_macro2::TokenStream> {
     };
 
     // fields and their name.
-    let mut heap_fields = vec![];
+    let mut approximate_heap_sizes = vec![];
     for (i, field) in fields.into_iter().enumerate() {
-        if let Some(f) = HeapField::new(i, field.clone())? {
-            heap_fields.push(f);
+        if let Some(f) = HeapField::new(i, field.clone(), container_attrs.as_ref())? {
+            approximate_heap_sizes.push(f.approximate_heap_size()?);
         }
     }
-
-    let approximate_heap_sizes = heap_fields.iter().map(|f| f.approximate_heap_size());
 
     let generics = &input.generics;
     let (impl_generics, ty_generics, where_clause) = generics.split_for_impl();

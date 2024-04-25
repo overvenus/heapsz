@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+# Update heapuse-tests/tests/{ui, expand} fixtures.
+TRYBUILD=overwrite \
+SNAPSHOTS=overwrite \
+cargo test
