@@ -1,0 +1,5 @@
+error: unsupported heap attribute, maybe you mean `#[heap(add)]`?
+ --> tests/ui/fail-derive-wrong-attrs-3.rs:6:5
+  |
+6 |     #[heap]
+  |     ^^^^^^^

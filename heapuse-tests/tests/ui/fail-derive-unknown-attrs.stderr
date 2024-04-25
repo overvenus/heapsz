@@ -1,4 +1,4 @@
-error: unknown heap attribute
+error: unknown heap attribute `unknown`
  --> tests/ui/fail-derive-unknown-attrs.rs:6:12
   |
 6 |     #[heap(unknown)]

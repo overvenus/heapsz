@@ -1,0 +1,5 @@
+error: heap attribute `with` miss mod path, it should be `with ="your::mod"`
+ --> tests/ui/fail-derive-wrong-attrs-2.rs:6:12
+  |
+6 |     #[heap(with)]
+  |            ^^^^

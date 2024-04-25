@@ -1,0 +1,19 @@
+warning: unused import: `heapuse_example::*`
+ --> tests/ui/fail-derive-generic.rs:2:5
+  |
+2 | use heapuse_example::*;
+  |     ^^^^^^^^^^^^^^^^^^
+  |
+  = note: `#[warn(unused_imports)]` on by default
+
+error[E0277]: the trait bound `T: HeapSize` is not satisfied
+ --> tests/ui/fail-derive-generic.rs:6:5
+  |
+6 | /     #[heap(add)]
+7 | |     pub a: T,
+  | |____________^ the trait `HeapSize` is not implemented for `T`
+  |
+help: consider restricting type parameter `T`
+  |
+5 | pub struct G1<T: heapuse::HeapSize> {
+  |                +++++++++++++++++++
