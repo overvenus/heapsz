@@ -104,6 +104,11 @@ decl_struct! {
     }
 }
 
+mod unit {
+    #[derive(Default, heapuse_derive::Heap)]
+    struct StructUnit;
+}
+
 pub mod with_attr {
     use self::remote::Inner;
 

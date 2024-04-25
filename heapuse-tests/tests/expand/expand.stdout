@@ -442,6 +442,21 @@ pub mod container {
     pub use full::StructVec;
     pub use full::StructContainers;
 }
+mod unit {
+    struct StructUnit;
+    #[automatically_derived]
+    impl ::core::default::Default for StructUnit {
+        #[inline]
+        fn default() -> StructUnit {
+            StructUnit {}
+        }
+    }
+    impl ::heapuse::HeapSize for StructUnit {
+        fn approximate_heap_size(&self) -> usize {
+            0
+        }
+    }
+}
 pub mod with_attr {
     use self::remote::Inner;
     pub mod remote {
