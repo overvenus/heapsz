@@ -141,16 +141,16 @@ impl HeapField {
         Ok(Some(HeapField { attr, ident, field }))
     }
 
-    fn approximate_heap_size(&self) -> Result<TokenStream> {
+    fn method_heap_size(&self) -> Result<TokenStream> {
         let ident = &self.ident;
         match self.attr {
             HeapAttr::Field(_) => Ok(quote_spanned! {self.field.span()=>
-                ::heapuse::HeapSize::approximate_heap_size(&self.#ident)
+                ::heapuse::HeapSize::heap_size(&self.#ident)
             }),
             HeapAttr::FieldWith(ref meta, ref mod_path) => {
                 let path = syn::parse_str::<syn::Path>(&mod_path.value())?;
                 Ok(quote_spanned! {meta.span()=>
-                    #path::approximate_heap_size(&self.#ident)
+                    #path::heap_size(&self.#ident)
                 })
             }
             HeapAttr::Container(ref meta) => {
@@ -189,10 +189,10 @@ fn render_struct(input: DeriveInput) -> Result<proc_macro2::TokenStream> {
         } => Vec::new(),
     };
 
-    let mut approximate_heap_sizes = vec![];
+    let mut heap_sizes = vec![];
     for (i, field) in fields.into_iter().enumerate() {
         if let Some(f) = HeapField::new(i, field.clone(), container_attrs.as_ref())? {
-            approximate_heap_sizes.push(f.approximate_heap_size()?);
+            heap_sizes.push(f.method_heap_size()?);
         }
     }
 
@@ -200,8 +200,8 @@ fn render_struct(input: DeriveInput) -> Result<proc_macro2::TokenStream> {
     let (impl_generics, ty_generics, where_clause) = generics.split_for_impl();
     Ok(quote! {
         impl #impl_generics ::heapuse::HeapSize for #ident #ty_generics #where_clause {
-            fn approximate_heap_size(&self) -> usize {
-                0 #(+ #approximate_heap_sizes)*
+            fn heap_size(&self) -> usize {
+                0 #(+ #heap_sizes)*
             }
         }
     })

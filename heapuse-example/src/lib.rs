@@ -48,13 +48,13 @@ macro_rules! decl_struct {
                 fn $struct_name() {
                     use heapuse::HeapSize;
                     let fs = full::$struct_name::default();
-                    assert_eq!(fs.approximate_heap_size(), 0);
+                    assert_eq!(fs.heap_size(), 0);
 
                     let ns = none::$struct_name::default();
-                    assert_eq!(ns.approximate_heap_size(), 0);
+                    assert_eq!(ns.heap_size(), 0);
 
                     let ns = all::$struct_name::default();
-                    assert_eq!(ns.approximate_heap_size(), 0);
+                    assert_eq!(ns.heap_size(), 0);
                 }
             )+
         }
@@ -122,8 +122,8 @@ pub mod with_attr {
 
         use super::remote;
 
-        pub fn approximate_heap_size(t: &remote::Inner) -> usize {
-            t.0.approximate_heap_size()
+        pub fn heap_size(t: &remote::Inner) -> usize {
+            t.0.heap_size()
         }
     }
 

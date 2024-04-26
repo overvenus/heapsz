@@ -19,8 +19,8 @@ pub mod primitive {
             }
         }
         impl ::heapuse::HeapSize for StructBool {
-            fn approximate_heap_size(&self) -> usize {
-                0 + ::heapuse::HeapSize::approximate_heap_size(&self.field_bool)
+            fn heap_size(&self) -> usize {
+                0 + ::heapuse::HeapSize::heap_size(&self.field_bool)
             }
         }
         pub struct StructPrimitives {
@@ -79,22 +79,22 @@ pub mod primitive {
             }
         }
         impl ::heapuse::HeapSize for StructPrimitives {
-            fn approximate_heap_size(&self) -> usize {
-                0 + ::heapuse::HeapSize::approximate_heap_size(&self.field_bool)
-                    + ::heapuse::HeapSize::approximate_heap_size(&self.field_u8)
-                    + ::heapuse::HeapSize::approximate_heap_size(&self.field_i8)
-                    + ::heapuse::HeapSize::approximate_heap_size(&self.field_u16)
-                    + ::heapuse::HeapSize::approximate_heap_size(&self.field_i16)
-                    + ::heapuse::HeapSize::approximate_heap_size(&self.field_u32)
-                    + ::heapuse::HeapSize::approximate_heap_size(&self.field_i32)
-                    + ::heapuse::HeapSize::approximate_heap_size(&self.field_u64)
-                    + ::heapuse::HeapSize::approximate_heap_size(&self.field_i64)
-                    + ::heapuse::HeapSize::approximate_heap_size(&self.field_u128)
-                    + ::heapuse::HeapSize::approximate_heap_size(&self.field_i128)
-                    + ::heapuse::HeapSize::approximate_heap_size(&self.field_usize)
-                    + ::heapuse::HeapSize::approximate_heap_size(&self.field_isize)
-                    + ::heapuse::HeapSize::approximate_heap_size(&self.field_f32)
-                    + ::heapuse::HeapSize::approximate_heap_size(&self.field_f64)
+            fn heap_size(&self) -> usize {
+                0 + ::heapuse::HeapSize::heap_size(&self.field_bool)
+                    + ::heapuse::HeapSize::heap_size(&self.field_u8)
+                    + ::heapuse::HeapSize::heap_size(&self.field_i8)
+                    + ::heapuse::HeapSize::heap_size(&self.field_u16)
+                    + ::heapuse::HeapSize::heap_size(&self.field_i16)
+                    + ::heapuse::HeapSize::heap_size(&self.field_u32)
+                    + ::heapuse::HeapSize::heap_size(&self.field_i32)
+                    + ::heapuse::HeapSize::heap_size(&self.field_u64)
+                    + ::heapuse::HeapSize::heap_size(&self.field_i64)
+                    + ::heapuse::HeapSize::heap_size(&self.field_u128)
+                    + ::heapuse::HeapSize::heap_size(&self.field_i128)
+                    + ::heapuse::HeapSize::heap_size(&self.field_usize)
+                    + ::heapuse::HeapSize::heap_size(&self.field_isize)
+                    + ::heapuse::HeapSize::heap_size(&self.field_f32)
+                    + ::heapuse::HeapSize::heap_size(&self.field_f64)
             }
         }
     }
@@ -112,7 +112,7 @@ pub mod primitive {
             }
         }
         impl ::heapuse::HeapSize for StructBool {
-            fn approximate_heap_size(&self) -> usize {
+            fn heap_size(&self) -> usize {
                 0
             }
         }
@@ -157,7 +157,7 @@ pub mod primitive {
             }
         }
         impl ::heapuse::HeapSize for StructPrimitives {
-            fn approximate_heap_size(&self) -> usize {
+            fn heap_size(&self) -> usize {
                 0
             }
         }
@@ -177,8 +177,8 @@ pub mod primitive {
             }
         }
         impl ::heapuse::HeapSize for StructBool {
-            fn approximate_heap_size(&self) -> usize {
-                0 + ::heapuse::HeapSize::approximate_heap_size(&self.field_bool)
+            fn heap_size(&self) -> usize {
+                0 + ::heapuse::HeapSize::heap_size(&self.field_bool)
             }
         }
         #[heap_size]
@@ -223,22 +223,22 @@ pub mod primitive {
             }
         }
         impl ::heapuse::HeapSize for StructPrimitives {
-            fn approximate_heap_size(&self) -> usize {
-                0 + ::heapuse::HeapSize::approximate_heap_size(&self.field_bool)
-                    + ::heapuse::HeapSize::approximate_heap_size(&self.field_u8)
-                    + ::heapuse::HeapSize::approximate_heap_size(&self.field_i8)
-                    + ::heapuse::HeapSize::approximate_heap_size(&self.field_u16)
-                    + ::heapuse::HeapSize::approximate_heap_size(&self.field_i16)
-                    + ::heapuse::HeapSize::approximate_heap_size(&self.field_u32)
-                    + ::heapuse::HeapSize::approximate_heap_size(&self.field_i32)
-                    + ::heapuse::HeapSize::approximate_heap_size(&self.field_u64)
-                    + ::heapuse::HeapSize::approximate_heap_size(&self.field_i64)
-                    + ::heapuse::HeapSize::approximate_heap_size(&self.field_u128)
-                    + ::heapuse::HeapSize::approximate_heap_size(&self.field_i128)
-                    + ::heapuse::HeapSize::approximate_heap_size(&self.field_usize)
-                    + ::heapuse::HeapSize::approximate_heap_size(&self.field_isize)
-                    + ::heapuse::HeapSize::approximate_heap_size(&self.field_f32)
-                    + ::heapuse::HeapSize::approximate_heap_size(&self.field_f64)
+            fn heap_size(&self) -> usize {
+                0 + ::heapuse::HeapSize::heap_size(&self.field_bool)
+                    + ::heapuse::HeapSize::heap_size(&self.field_u8)
+                    + ::heapuse::HeapSize::heap_size(&self.field_i8)
+                    + ::heapuse::HeapSize::heap_size(&self.field_u16)
+                    + ::heapuse::HeapSize::heap_size(&self.field_i16)
+                    + ::heapuse::HeapSize::heap_size(&self.field_u32)
+                    + ::heapuse::HeapSize::heap_size(&self.field_i32)
+                    + ::heapuse::HeapSize::heap_size(&self.field_u64)
+                    + ::heapuse::HeapSize::heap_size(&self.field_i64)
+                    + ::heapuse::HeapSize::heap_size(&self.field_u128)
+                    + ::heapuse::HeapSize::heap_size(&self.field_i128)
+                    + ::heapuse::HeapSize::heap_size(&self.field_usize)
+                    + ::heapuse::HeapSize::heap_size(&self.field_isize)
+                    + ::heapuse::HeapSize::heap_size(&self.field_f32)
+                    + ::heapuse::HeapSize::heap_size(&self.field_f64)
             }
         }
     }
@@ -264,8 +264,8 @@ pub mod container {
             }
         }
         impl ::heapuse::HeapSize for StructHeapMap {
-            fn approximate_heap_size(&self) -> usize {
-                0 + ::heapuse::HeapSize::approximate_heap_size(&self.field_map)
+            fn heap_size(&self) -> usize {
+                0 + ::heapuse::HeapSize::heap_size(&self.field_map)
             }
         }
         pub struct StructVec {
@@ -282,8 +282,8 @@ pub mod container {
             }
         }
         impl ::heapuse::HeapSize for StructVec {
-            fn approximate_heap_size(&self) -> usize {
-                0 + ::heapuse::HeapSize::approximate_heap_size(&self.field_vec)
+            fn heap_size(&self) -> usize {
+                0 + ::heapuse::HeapSize::heap_size(&self.field_vec)
             }
         }
         pub struct StructContainers {
@@ -306,9 +306,9 @@ pub mod container {
             }
         }
         impl ::heapuse::HeapSize for StructContainers {
-            fn approximate_heap_size(&self) -> usize {
-                0 + ::heapuse::HeapSize::approximate_heap_size(&self.field_vec)
-                    + ::heapuse::HeapSize::approximate_heap_size(&self.field_map)
+            fn heap_size(&self) -> usize {
+                0 + ::heapuse::HeapSize::heap_size(&self.field_vec)
+                    + ::heapuse::HeapSize::heap_size(&self.field_map)
             }
         }
     }
@@ -329,7 +329,7 @@ pub mod container {
             }
         }
         impl ::heapuse::HeapSize for StructHeapMap {
-            fn approximate_heap_size(&self) -> usize {
+            fn heap_size(&self) -> usize {
                 0
             }
         }
@@ -346,7 +346,7 @@ pub mod container {
             }
         }
         impl ::heapuse::HeapSize for StructVec {
-            fn approximate_heap_size(&self) -> usize {
+            fn heap_size(&self) -> usize {
                 0
             }
         }
@@ -368,7 +368,7 @@ pub mod container {
             }
         }
         impl ::heapuse::HeapSize for StructContainers {
-            fn approximate_heap_size(&self) -> usize {
+            fn heap_size(&self) -> usize {
                 0
             }
         }
@@ -391,8 +391,8 @@ pub mod container {
             }
         }
         impl ::heapuse::HeapSize for StructHeapMap {
-            fn approximate_heap_size(&self) -> usize {
-                0 + ::heapuse::HeapSize::approximate_heap_size(&self.field_map)
+            fn heap_size(&self) -> usize {
+                0 + ::heapuse::HeapSize::heap_size(&self.field_map)
             }
         }
         #[heap_size]
@@ -409,8 +409,8 @@ pub mod container {
             }
         }
         impl ::heapuse::HeapSize for StructVec {
-            fn approximate_heap_size(&self) -> usize {
-                0 + ::heapuse::HeapSize::approximate_heap_size(&self.field_vec)
+            fn heap_size(&self) -> usize {
+                0 + ::heapuse::HeapSize::heap_size(&self.field_vec)
             }
         }
         #[heap_size]
@@ -432,9 +432,9 @@ pub mod container {
             }
         }
         impl ::heapuse::HeapSize for StructContainers {
-            fn approximate_heap_size(&self) -> usize {
-                0 + ::heapuse::HeapSize::approximate_heap_size(&self.field_vec)
-                    + ::heapuse::HeapSize::approximate_heap_size(&self.field_map)
+            fn heap_size(&self) -> usize {
+                0 + ::heapuse::HeapSize::heap_size(&self.field_vec)
+                    + ::heapuse::HeapSize::heap_size(&self.field_map)
             }
         }
     }
@@ -452,7 +452,7 @@ mod unit {
         }
     }
     impl ::heapuse::HeapSize for StructUnit {
-        fn approximate_heap_size(&self) -> usize {
+        fn heap_size(&self) -> usize {
             0
         }
     }
@@ -472,8 +472,8 @@ pub mod with_attr {
     pub mod remote_inner_heap_size {
         use heapuse::HeapSize;
         use super::remote;
-        pub fn approximate_heap_size(t: &remote::Inner) -> usize {
-            t.0.approximate_heap_size()
+        pub fn heap_size(t: &remote::Inner) -> usize {
+            t.0.heap_size()
         }
     }
     pub struct Wtih {
@@ -490,8 +490,8 @@ pub mod with_attr {
         }
     }
     impl ::heapuse::HeapSize for Wtih {
-        fn approximate_heap_size(&self) -> usize {
-            0 + remote_inner_heap_size::approximate_heap_size(&self.inner)
+        fn heap_size(&self) -> usize {
+            0 + remote_inner_heap_size::heap_size(&self.inner)
         }
     }
 }
