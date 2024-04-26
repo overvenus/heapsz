@@ -1,3 +1,19 @@
+macro_rules! test_zero_heap_size {
+    (
+        $($struct_name: ident,)+
+    ) => {
+        $(
+            #[test]
+            #[allow(non_snake_case)]
+            fn $struct_name() {
+                use heapuse::HeapSize;
+                let fs = $struct_name ::default();
+                assert_eq!(fs.heap_size(), 0);
+            }
+        )+
+    }
+}
+
 macro_rules! decl_struct {
     (
         mod $mod_name: ident {
@@ -11,51 +27,56 @@ macro_rules! decl_struct {
         }
     ) => {
         pub mod $mod_name {
-            pub mod full { $(
-                #[derive(Default, heapuse_derive::Heap)]
-                pub struct $struct_name {
-                    $(
-                        #[heap_size]
-                        pub $field_name : $field_type,
-                    )*
-                }
-            )+ }
+            pub mod full {
+                $(
+                    #[derive(Default, heapuse_derive::Heap)]
+                    pub struct $struct_name {
+                        $(
+                            #[heap_size]
+                            pub $field_name : $field_type,
+                        )*
+                    }
+                )+
 
-            pub mod none { $(
-                #[derive(Default, heapuse_derive::Heap)]
-                pub struct $struct_name {
-                    $(
-                        pub $field_name : $field_type,
-                    )*
+                test_zero_heap_size! {
+                    $($struct_name,)+
                 }
-            )+ }
 
-            pub mod all { $(
-                #[derive(Default, heapuse_derive::Heap)]
-                #[heap_size]
-                pub struct $struct_name {
-                    $(
-                        pub $field_name : $field_type,
-                    )*
+            }
+
+            pub mod none {
+                $(
+                    #[derive(Default, heapuse_derive::Heap)]
+                    pub struct $struct_name {
+                        $(
+                            pub $field_name : $field_type,
+                        )*
+                    }
+                )+
+
+                test_zero_heap_size! {
+                    $($struct_name,)+
                 }
-            )+ }
+            }
+
+            pub mod all {
+                $(
+                    #[derive(Default, heapuse_derive::Heap)]
+                    #[heap_size]
+                    pub struct $struct_name {
+                        $(
+                            pub $field_name : $field_type,
+                        )*
+                    }
+                )+
+
+                test_zero_heap_size! {
+                    $($struct_name,)+
+                }
+            }
 
             $(
                 pub use full::$struct_name;
-
-                #[allow(non_snake_case)]
-                #[test]
-                fn $struct_name() {
-                    use heapuse::HeapSize;
-                    let fs = full::$struct_name::default();
-                    assert_eq!(fs.heap_size(), 0);
-
-                    let ns = none::$struct_name::default();
-                    assert_eq!(ns.heap_size(), 0);
-
-                    let ns = all::$struct_name::default();
-                    assert_eq!(ns.heap_size(), 0);
-                }
             )+
         }
     }
@@ -104,9 +125,31 @@ decl_struct! {
     }
 }
 
-mod unit {
+mod unit_tuple {
     #[derive(Default, heapuse_derive::Heap)]
     struct StructUnit;
+
+    #[derive(Default, heapuse_derive::Heap)]
+    struct StructTuple1(
+        crate::primitive::StructBool,
+        crate::primitive::StructPrimitives,
+    );
+
+    #[derive(Default, heapuse_derive::Heap)]
+    #[heap_size]
+    struct StructTuple2(
+        crate::primitive::StructBool,
+        crate::primitive::StructPrimitives,
+    );
+
+    #[cfg(test)]
+    mod tests {
+        use super::*;
+
+        test_zero_heap_size! {
+            StructUnit, StructTuple1, StructTuple2,
+        }
+    }
 }
 
 pub mod with_attr {
