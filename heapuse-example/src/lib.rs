@@ -41,12 +41,12 @@ macro_rules! decl_struct {
                 test_zero_heap_size! {
                     $($struct_name,)+
                 }
-
             }
 
-            pub mod none {
+            pub mod all {
                 $(
                     #[derive(Default, heapuse_derive::Heap)]
+                    #[heap_size]
                     pub struct $struct_name {
                         $(
                             pub $field_name : $field_type,
@@ -59,10 +59,22 @@ macro_rules! decl_struct {
                 }
             }
 
-            pub mod all {
+            pub mod skip {
                 $(
                     #[derive(Default, heapuse_derive::Heap)]
                     #[heap_size]
+                    pub struct $struct_name {
+                        $(
+                            #[heap_size(skip)]
+                            pub $field_name : $field_type,
+                        )*
+                    }
+                )+
+            }
+
+            pub mod blank {
+                $(
+                    #[derive(Default, heapuse_derive::Heap)]
                     pub struct $struct_name {
                         $(
                             pub $field_name : $field_type,
@@ -139,7 +151,7 @@ mod unit_tuple {
     #[heap_size]
     struct StructTuple2(
         crate::primitive::StructBool,
-        crate::primitive::StructPrimitives,
+        #[heap_size(skip)] crate::primitive::StructPrimitives,
     );
 
     #[cfg(test)]

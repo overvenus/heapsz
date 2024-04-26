@@ -12,6 +12,8 @@ use syn::{
 const HEAP_IDENT: &str = "heap_size";
 // #[heap_size(with = "...")] Field attributes
 const HEAP_ATTR_WITH_IDENT: &str = "with";
+// #[heap_size(skip)] Field attributes
+const HEAP_ATTR_SKIP_IDENT: &str = "skip";
 
 #[proc_macro_derive(Heap, attributes(heap_size))]
 pub fn heap(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
@@ -37,6 +39,7 @@ enum HeapAttr {
     Container(Meta),
     Field(Meta),
     FieldWith(Meta, LitStr),
+    FieldSkip(Meta),
 }
 
 impl HeapAttr {
@@ -75,6 +78,12 @@ impl HeapAttr {
                         Ok(Some(HeapAttr::Field(meta)))
                     } else {
                         Ok(Some(HeapAttr::Container(meta)))
+                    }
+                } else if name.is_ident(HEAP_ATTR_SKIP_IDENT) {
+                    if is_field {
+                        Ok(Some(HeapAttr::FieldSkip(meta)))
+                    } else {
+                        bail!(meta, "`#[heap_size(skip)]` is a field attribute")
                     }
                 } else if name.is_ident(HEAP_ATTR_WITH_IDENT) {
                     bail!(
@@ -120,7 +129,6 @@ struct HeapField {
 impl HeapField {
     fn new(index: usize, field: Field, container_attr: Option<&HeapAttr>) -> Result<Option<Self>> {
         let attr = match HeapAttr::new(&field.attrs, true, &field)? {
-            Some(attr) => attr,
             None => {
                 if let Some(HeapAttr::Container(ref meta)) = container_attr {
                     HeapAttr::Field(meta.clone())
@@ -128,6 +136,18 @@ impl HeapField {
                     return Ok(None);
                 }
             }
+            Some(HeapAttr::FieldSkip(meta)) => {
+                if let Some(HeapAttr::Container(_)) = container_attr {
+                    return Ok(None);
+                } else {
+                    bail!(
+                        meta,
+                        "`#[heap_size(skip)]` is only allow with a container \
+                        attribute `#[heap_size]`."
+                    );
+                }
+            }
+            Some(attr) => attr,
         };
 
         let ident = field.ident.clone().map(|x| quote!(#x)).unwrap_or_else(|| {
@@ -153,10 +173,16 @@ impl HeapField {
                     #path::heap_size(&self.#ident)
                 })
             }
+            HeapAttr::FieldSkip(_) => {
+                bail!(
+                    self.field.clone(),
+                    "internal error `#[heap_size(skip)]` field generates `fn heap_size()`",
+                );
+            }
             HeapAttr::Container(ref meta) => {
                 bail!(
                     self.field.clone(),
-                    "unexpected container attribute is found on field allowed in field: {}",
+                    "unexpected container attribute is found on field: {}",
                     meta.to_token_stream().to_string()
                 );
             }
