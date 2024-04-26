@@ -1,0 +1,5 @@
+error: heap_size attribute `with` must be followed by a module path, `with = "some::mod"`
+ --> tests/ui/fail-derive-wrong-attrs-with.rs:6:17
+  |
+6 |     #[heap_size(with)]
+  |                 ^^^^

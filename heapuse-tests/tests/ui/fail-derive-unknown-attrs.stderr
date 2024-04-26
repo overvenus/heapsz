@@ -1,5 +1,5 @@
-error: unknown heap attribute `unknown`
- --> tests/ui/fail-derive-unknown-attrs.rs:6:12
+error: unknown heap_size attribute `unknown`
+ --> tests/ui/fail-derive-unknown-attrs.rs:6:17
   |
-6 |     #[heap(unknown)]
-  |            ^^^^^^^
+6 |     #[heap_size(unknown)]
+  |                 ^^^^^^^

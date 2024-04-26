@@ -1,9 +1,8 @@
 use heapuse_derive::Heap;
-use heapuse_example::*;
 
 #[derive(Heap)]
 pub struct G1<T> {
-    #[heap(add)]
+    #[heap_size]
     pub a: T,
 }
 

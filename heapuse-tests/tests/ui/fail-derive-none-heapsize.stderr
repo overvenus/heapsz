@@ -1,7 +1,7 @@
 error[E0277]: the trait bound `NoneHeapSize: HeapSize` is not satisfied
   --> tests/ui/fail-derive-none-heapsize.rs:9:5
    |
-9  | /     #[heap(add)]
+9  | /     #[heap_size]
 10 | |     pub a: NoneHeapSize,
    | |_______________________^ the trait `HeapSize` is not implemented for `NoneHeapSize`
    |

@@ -3,7 +3,7 @@ use heapuse_example::*;
 
 #[derive(Heap)]
 pub struct UnknownAttr {
-    #[heap(unknown)]
+    #[heap_size(unknown)]
     pub a: primitive::StructPrimitives,
 }
 

@@ -1,5 +1,0 @@
-error: heap attribute `add` is followed by an unexpected mod path
- --> tests/ui/fail-derive-wrong-attrs-1.rs:6:12
-  |
-6 |     #[heap(add = "some::mod")]
-  |            ^^^^^^^^^^^^^^^^^

@@ -8,17 +8,12 @@ use syn::{
     Token,
 };
 
-// #[heap(...)]
-const HEAP_IDENT: &str = "heap";
-// #[heap(all)] Container attributes
-#[allow(dead_code)]
-const HEAP_ATTR_ALL_IDENT: &str = "all";
-// #[heap(add)] Field attributes
-const HEAP_ATTR_ADD_IDENT: &str = "add";
-// #[heap(with = "...")] Field attributes
+// #[heap_size]
+const HEAP_IDENT: &str = "heap_size";
+// #[heap_size(with = "...")] Field attributes
 const HEAP_ATTR_WITH_IDENT: &str = "with";
 
-#[proc_macro_derive(Heap, attributes(heap))]
+#[proc_macro_derive(Heap, attributes(heap_size))]
 pub fn heap(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
     let input: DeriveInput = syn::parse(input).unwrap();
 
@@ -39,13 +34,17 @@ macro_rules! bail {
 }
 
 enum HeapAttr {
-    All(Meta),
-    Add(Meta),
-    With(Meta, LitStr), // TODO: Calculate heap size using the specified mod path.
+    Container(Meta),
+    Field(Meta),
+    FieldWith(Meta, LitStr),
 }
 
 impl HeapAttr {
-    fn new<T: ToTokens>(raw_attrs: &[Attribute], origin: T) -> Result<Option<Self>> {
+    fn new<T: ToTokens>(
+        raw_attrs: &[Attribute],
+        is_field: bool,
+        origin: T,
+    ) -> Result<Option<Self>> {
         let mut attrs = vec![];
         for attr in raw_attrs {
             if let Meta::List(meta_list) = &attr.meta {
@@ -53,15 +52,12 @@ impl HeapAttr {
                     let heap_attrs = meta_list
                         .parse_args_with(Punctuated::<Meta, Token![,]>::parse_terminated)?;
                     if heap_attrs.len() > 1 {
-                        bail!(meta_list, "too many heap attributes");
+                        bail!(meta_list, "too many heap_size attributes");
                     }
                     attrs.extend(heap_attrs);
                 }
             } else {
-                bail!(
-                    attr,
-                    "unsupported heap attribute, maybe you mean `#[heap(add)]`?"
-                );
+                attrs.push(attr.meta.clone());
             }
         }
         let meta = if attrs.is_empty() {
@@ -69,24 +65,26 @@ impl HeapAttr {
         } else if attrs.len() == 1 {
             attrs.pop().unwrap()
         } else {
-            bail!(origin, "too many heap attributes")
+            bail!(origin, "too many heap_size attributes")
         };
 
         match meta {
             Meta::Path(ref name) => {
-                if name.is_ident(HEAP_ATTR_ADD_IDENT) {
-                    Ok(Some(HeapAttr::Add(meta)))
-                } else if name.is_ident(HEAP_ATTR_ALL_IDENT) {
-                    Ok(Some(HeapAttr::All(meta)))
+                if name.is_ident(HEAP_IDENT) {
+                    if is_field {
+                        Ok(Some(HeapAttr::Field(meta)))
+                    } else {
+                        Ok(Some(HeapAttr::Container(meta)))
+                    }
                 } else if name.is_ident(HEAP_ATTR_WITH_IDENT) {
                     bail!(
                         meta,
-                        "heap attribute `with` miss mod path, \
-                        it should be `with =\"your::mod\"`"
+                        "heap_size attribute `with` must be followed by \
+                        a module path, `with = \"some::mod\"`"
                     )
                 } else {
                     let name = name.to_token_stream().to_string().replace(' ', "");
-                    bail!(meta, "unknown heap attribute `{}`", name)
+                    bail!(meta, "unknown heap_size attribute `{}`", name)
                 }
             }
             Meta::NameValue(MetaNameValue {
@@ -99,17 +97,10 @@ impl HeapAttr {
                 ..
             }) => {
                 if path.is_ident(HEAP_ATTR_WITH_IDENT) {
-                    Ok(Some(HeapAttr::With(meta.clone(), mod_path.clone())))
-                } else if path.is_ident(HEAP_ATTR_ADD_IDENT) || path.is_ident(HEAP_ATTR_ALL_IDENT) {
-                    let name = path.to_token_stream().to_string().replace(' ', "");
-                    bail!(
-                        meta,
-                        "heap attribute `{}` is followed by an unexpected mod path",
-                        name
-                    )
+                    Ok(Some(HeapAttr::FieldWith(meta.clone(), mod_path.clone())))
                 } else {
                     let name = path.to_token_stream().to_string().replace(' ', "");
-                    bail!(meta, "unknown heap attribute `{}`", name)
+                    bail!(meta, "unknown heap_size attribute `{}`", name)
                 }
             }
             meta => {
@@ -128,11 +119,11 @@ struct HeapField {
 
 impl HeapField {
     fn new(index: usize, field: Field, container_attr: Option<&HeapAttr>) -> Result<Option<Self>> {
-        let attr = match HeapAttr::new(&field.attrs, &field)? {
+        let attr = match HeapAttr::new(&field.attrs, true, &field)? {
             Some(attr) => attr,
             None => {
-                if let Some(HeapAttr::All(ref meta)) = container_attr {
-                    HeapAttr::Add(meta.clone())
+                if let Some(HeapAttr::Container(ref meta)) = container_attr {
+                    HeapAttr::Field(meta.clone())
                 } else {
                     return Ok(None);
                 }
@@ -153,24 +144,28 @@ impl HeapField {
     fn approximate_heap_size(&self) -> Result<TokenStream> {
         let ident = &self.ident;
         match self.attr {
-            HeapAttr::Add(_) => Ok(quote_spanned! {self.field.span()=>
+            HeapAttr::Field(_) => Ok(quote_spanned! {self.field.span()=>
                 ::heapuse::HeapSize::approximate_heap_size(&self.#ident)
             }),
-            HeapAttr::With(ref meta, ref mod_path) => {
+            HeapAttr::FieldWith(ref meta, ref mod_path) => {
                 let path = syn::parse_str::<syn::Path>(&mod_path.value())?;
                 Ok(quote_spanned! {meta.span()=>
                     #path::approximate_heap_size(&self.#ident)
                 })
             }
-            HeapAttr::All(ref meta) => {
-                bail!(meta, "`#[heap(all)]` is not allowed in field");
+            HeapAttr::Container(ref meta) => {
+                bail!(
+                    self.field.clone(),
+                    "unexpected container attribute is found on field allowed in field: {}",
+                    meta.to_token_stream().to_string()
+                );
             }
         }
     }
 }
 
 fn render_struct(input: DeriveInput) -> Result<proc_macro2::TokenStream> {
-    let container_attrs = HeapAttr::new(&input.attrs, &input)?;
+    let container_attrs = HeapAttr::new(&input.attrs, false, &input)?;
 
     let ident = input.ident.clone();
     let Data::Struct(data) = input.data else {

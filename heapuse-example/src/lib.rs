@@ -15,7 +15,7 @@ macro_rules! decl_struct {
                 #[derive(Default, heapuse_derive::Heap)]
                 pub struct $struct_name {
                     $(
-                        #[heap(add)]
+                        #[heap_size]
                         pub $field_name : $field_type,
                     )*
                 }
@@ -32,7 +32,7 @@ macro_rules! decl_struct {
 
             pub mod all { $(
                 #[derive(Default, heapuse_derive::Heap)]
-                #[heap(all)]
+                #[heap_size]
                 pub struct $struct_name {
                     $(
                         pub $field_name : $field_type,
@@ -129,7 +129,7 @@ pub mod with_attr {
 
     #[derive(Default, heapuse_derive::Heap)]
     pub struct Wtih {
-        #[heap(with = "remote_inner_heap_size")]
+        #[heap_size(with = "remote_inner_heap_size")]
         pub inner: Inner,
     }
 }

@@ -1,12 +1,12 @@
 use heapuse_derive::Heap;
 
 struct NoneHeapSize {
-    a: ()
+    a: (),
 }
 
 #[derive(Heap)]
 pub struct BadStruct {
-    #[heap(add)]
+    #[heap_size]
     pub a: NoneHeapSize,
 }
 

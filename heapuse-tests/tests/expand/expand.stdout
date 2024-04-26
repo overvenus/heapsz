@@ -6,7 +6,7 @@ extern crate std;
 pub mod primitive {
     pub mod full {
         pub struct StructBool {
-            #[heap(add)]
+            #[heap_size]
             pub field_bool: bool,
         }
         #[automatically_derived]
@@ -24,35 +24,35 @@ pub mod primitive {
             }
         }
         pub struct StructPrimitives {
-            #[heap(add)]
+            #[heap_size]
             pub field_bool: bool,
-            #[heap(add)]
+            #[heap_size]
             pub field_u8: u8,
-            #[heap(add)]
+            #[heap_size]
             pub field_i8: i8,
-            #[heap(add)]
+            #[heap_size]
             pub field_u16: u16,
-            #[heap(add)]
+            #[heap_size]
             pub field_i16: i16,
-            #[heap(add)]
+            #[heap_size]
             pub field_u32: u32,
-            #[heap(add)]
+            #[heap_size]
             pub field_i32: i32,
-            #[heap(add)]
+            #[heap_size]
             pub field_u64: u64,
-            #[heap(add)]
+            #[heap_size]
             pub field_i64: i64,
-            #[heap(add)]
+            #[heap_size]
             pub field_u128: u128,
-            #[heap(add)]
+            #[heap_size]
             pub field_i128: i128,
-            #[heap(add)]
+            #[heap_size]
             pub field_usize: usize,
-            #[heap(add)]
+            #[heap_size]
             pub field_isize: isize,
-            #[heap(add)]
+            #[heap_size]
             pub field_f32: f32,
-            #[heap(add)]
+            #[heap_size]
             pub field_f64: f64,
         }
         #[automatically_derived]
@@ -163,7 +163,7 @@ pub mod primitive {
         }
     }
     pub mod all {
-        #[heap(all)]
+        #[heap_size]
         pub struct StructBool {
             pub field_bool: bool,
         }
@@ -181,7 +181,7 @@ pub mod primitive {
                 0 + ::heapuse::HeapSize::approximate_heap_size(&self.field_bool)
             }
         }
-        #[heap(all)]
+        #[heap_size]
         pub struct StructPrimitives {
             pub field_bool: bool,
             pub field_u8: u8,
@@ -248,7 +248,7 @@ pub mod primitive {
 pub mod container {
     pub mod full {
         pub struct StructHeapMap {
-            #[heap(add)]
+            #[heap_size]
             pub field_map: std::collections::HashMap<
                 usize,
                 crate::primitive::StructBool,
@@ -269,7 +269,7 @@ pub mod container {
             }
         }
         pub struct StructVec {
-            #[heap(add)]
+            #[heap_size]
             pub field_vec: Vec<crate::primitive::StructPrimitives>,
         }
         #[automatically_derived]
@@ -287,9 +287,9 @@ pub mod container {
             }
         }
         pub struct StructContainers {
-            #[heap(add)]
+            #[heap_size]
             pub field_vec: Vec<crate::primitive::StructPrimitives>,
-            #[heap(add)]
+            #[heap_size]
             pub field_map: std::collections::HashMap<
                 usize,
                 crate::primitive::StructBool,
@@ -374,7 +374,7 @@ pub mod container {
         }
     }
     pub mod all {
-        #[heap(all)]
+        #[heap_size]
         pub struct StructHeapMap {
             pub field_map: std::collections::HashMap<
                 usize,
@@ -395,7 +395,7 @@ pub mod container {
                 0 + ::heapuse::HeapSize::approximate_heap_size(&self.field_map)
             }
         }
-        #[heap(all)]
+        #[heap_size]
         pub struct StructVec {
             pub field_vec: Vec<crate::primitive::StructPrimitives>,
         }
@@ -413,7 +413,7 @@ pub mod container {
                 0 + ::heapuse::HeapSize::approximate_heap_size(&self.field_vec)
             }
         }
-        #[heap(all)]
+        #[heap_size]
         pub struct StructContainers {
             pub field_vec: Vec<crate::primitive::StructPrimitives>,
             pub field_map: std::collections::HashMap<
@@ -477,7 +477,7 @@ pub mod with_attr {
         }
     }
     pub struct Wtih {
-        #[heap(with = "remote_inner_heap_size")]
+        #[heap_size(with = "remote_inner_heap_size")]
         pub inner: Inner,
     }
     #[automatically_derived]

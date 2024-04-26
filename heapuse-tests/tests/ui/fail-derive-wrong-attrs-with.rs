@@ -3,7 +3,7 @@ use heapuse_example::*;
 
 #[derive(Heap)]
 pub struct WrongAttr {
-    #[heap(add = "some::mod")]
+    #[heap_size(with)]
     pub a: primitive::StructPrimitives,
 }
 
