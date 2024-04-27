@@ -685,3 +685,85 @@ pub mod with_attr {
         }
     }
 }
+pub mod enums {
+    use super::with_attr::{remote::*, *};
+    pub enum Enum {
+        A(#[heap_size] usize),
+        B(#[heap_size] usize, usize),
+        C(#[heap_size(with = "remote_inner_heap_size")] Inner, usize),
+        D {
+            #[heap_size(with = "remote_inner_heap_size")]
+            inner: Inner,
+            #[heap_size]
+            size1: usize,
+            size2: usize,
+        },
+    }
+    impl ::heapuse::HeapSize for Enum {
+        fn heap_size(&self) -> usize {
+            #[allow(unused_variables)]
+            match self {
+                Self::A(f_0) => 0 + ::heapuse::HeapSize::heap_size(f_0),
+                Self::B(f_0, f_1) => 0 + ::heapuse::HeapSize::heap_size(f_0),
+                Self::C(f_0, f_1) => 0 + remote_inner_heap_size::heap_size(f_0),
+                Self::D { inner, size1, size2 } => {
+                    0 + remote_inner_heap_size::heap_size(inner)
+                        + ::heapuse::HeapSize::heap_size(size1)
+                }
+            }
+        }
+    }
+    #[heap_size]
+    pub enum EnumAll {
+        A(usize),
+        B(usize, usize),
+        C(#[heap_size(with = "remote_inner_heap_size")] Inner, usize),
+        D {
+            #[heap_size(with = "remote_inner_heap_size")]
+            inner: Inner,
+            size1: usize,
+            size2: usize,
+        },
+    }
+    impl ::heapuse::HeapSize for EnumAll {
+        fn heap_size(&self) -> usize {
+            #[allow(unused_variables)]
+            match self {
+                Self::A(f_0) => 0 + ::heapuse::HeapSize::heap_size(f_0),
+                Self::B(f_0, f_1) => {
+                    0 + ::heapuse::HeapSize::heap_size(f_0)
+                        + ::heapuse::HeapSize::heap_size(f_1)
+                }
+                Self::C(f_0, f_1) => {
+                    0 + remote_inner_heap_size::heap_size(f_0)
+                        + ::heapuse::HeapSize::heap_size(f_1)
+                }
+                Self::D { inner, size1, size2 } => {
+                    0 + remote_inner_heap_size::heap_size(inner)
+                        + ::heapuse::HeapSize::heap_size(size1)
+                        + ::heapuse::HeapSize::heap_size(size2)
+                }
+            }
+        }
+    }
+    #[heap_size]
+    pub enum EnumSkip {
+        A(#[heap_size(skip)] Inner, usize),
+        B { #[heap_size(skip)] inner: Inner, size1: usize, size2: usize },
+        #[heap_size(skip)]
+        C { inner: Inner },
+    }
+    impl ::heapuse::HeapSize for EnumSkip {
+        fn heap_size(&self) -> usize {
+            #[allow(unused_variables)]
+            match self {
+                Self::A(f_0, f_1) => 0 + ::heapuse::HeapSize::heap_size(f_1),
+                Self::B { inner, size1, size2 } => {
+                    0 + ::heapuse::HeapSize::heap_size(size1)
+                        + ::heapuse::HeapSize::heap_size(size2)
+                }
+                Self::C { inner } => 0,
+            }
+        }
+    }
+}

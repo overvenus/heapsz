@@ -46,4 +46,32 @@ pub struct A1<T: HeapSize> {
     pub b: Vec<T>,
 }
 
+#[derive(Heap)]
+#[heap_size]
+pub enum E1 {
+    V1(usize, Vec<usize>),
+    V2 { a: usize, b: Vec<usize> },
+}
+
+#[derive(Heap)]
+pub enum E2 {
+    V1(#[heap_size] usize, Vec<usize>),
+    V2 {
+        a: usize,
+        #[heap_size]
+        b: Vec<usize>,
+    },
+}
+
+#[derive(Heap)]
+#[heap_size]
+pub enum E3 {
+    V1(usize, Vec<usize>),
+    #[heap_size(skip)]
+    V2 {
+        a: usize,
+        b: Vec<usize>,
+    },
+}
+
 fn main() {}

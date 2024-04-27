@@ -1,0 +1,8 @@
+error: `Heap` can not be derived for a union
+ --> tests/ui/fail-derive-union.rs:4:1
+  |
+4 | / union Union {
+5 | |     f1: u32,
+6 | |     f2: f32,
+7 | | }
+  | |_^

@@ -3,3 +3,9 @@ error: `#[heap_size(skip)]` is only allow with a container attribute `#[heap_siz
   |
 6 |     #[heap_size(skip)]
   |                 ^^^^
+
+error: `#[heap_size(skip)]` is only allow with a container attribute `#[heap_size]`.
+  --> tests/ui/fail-derive-wrong-attrs-skip.rs:12:17
+   |
+12 |     #[heap_size(skip)]
+   |                 ^^^^
