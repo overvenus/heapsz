@@ -1,16 +1,18 @@
 use heapuse::HeapSize;
 use heapuse_derive::Heap;
-use heapuse_example::*;
+
+#[path = "../../../heapuse/examples/allowlisting.rs"]
+mod allowlisting;
 
 #[derive(Heap)]
 pub struct T1 {
-    pub a: primitive::StructPrimitives,
+    pub a: allowlisting::FullAllow,
 }
 
 #[derive(Heap)]
 pub struct T2 {
     #[heap_size]
-    pub a: primitive::StructPrimitives,
+    pub a: allowlisting::FullAllow,
 }
 
 #[derive(Heap)]

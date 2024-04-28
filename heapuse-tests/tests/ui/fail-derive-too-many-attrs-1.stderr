@@ -1,5 +1,5 @@
 error: too many heap_size attributes
- --> tests/ui/fail-derive-too-many-attrs-1.rs:6:7
+ --> tests/ui/fail-derive-too-many-attrs-1.rs:8:7
   |
-6 |     #[heap_size(with = "mod::a", with = "mod::b")]
+8 |     #[heap_size(with = "mod::a", with = "mod::b")]
   |       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

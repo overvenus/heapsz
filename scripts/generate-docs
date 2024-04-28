@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+RUSTDOCFLAGS="--cfg docsrs" cargo doc --verbose

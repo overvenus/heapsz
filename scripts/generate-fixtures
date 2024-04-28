@@ -5,4 +5,4 @@ set -euo pipefail
 # Update heapuse-tests/tests/{ui, expand} fixtures.
 TRYBUILD=overwrite \
 SNAPSHOTS=overwrite \
-cargo test
+cargo test -p heapuse-tests

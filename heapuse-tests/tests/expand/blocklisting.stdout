@@ -1,0 +1,58 @@
+#![feature(prelude_import)]
+#[prelude_import]
+use std::prelude::rust_2021::*;
+#[macro_use]
+extern crate std;
+use heapuse_derive::Heap;
+#[heap_size]
+pub struct FullBlock {
+    #[heap_size(skip)]
+    pub field_bool: bool,
+    #[heap_size(skip)]
+    pub field_u8: u8,
+    #[heap_size(skip)]
+    pub field_u16: u16,
+    #[heap_size(skip)]
+    pub field_u32: u32,
+    #[heap_size(skip)]
+    pub field_u64: u64,
+    #[heap_size(skip)]
+    pub field_u128: u128,
+    #[heap_size(skip)]
+    pub field_usize: usize,
+    #[heap_size(skip)]
+    pub field_f32: f32,
+    #[heap_size(skip)]
+    pub field_f64: f64,
+}
+impl ::heapuse::HeapSize for FullBlock {
+    fn heap_size(&self) -> usize {
+        0
+    }
+}
+#[heap_size]
+pub struct PartialBlock {
+    #[heap_size(skip)]
+    pub field_bool: bool,
+    #[heap_size(skip)]
+    pub field_u8: u8,
+    #[heap_size(skip)]
+    pub field_u16: u16,
+    #[heap_size(skip)]
+    pub field_u32: u32,
+    #[heap_size(skip)]
+    pub field_u64: u64,
+    pub field_u128: u128,
+    pub field_usize: usize,
+    pub field_f32: f32,
+    pub field_f64: f64,
+}
+impl ::heapuse::HeapSize for PartialBlock {
+    fn heap_size(&self) -> usize {
+        0 + ::heapuse::HeapSize::heap_size(&self.field_u128)
+            + ::heapuse::HeapSize::heap_size(&self.field_usize)
+            + ::heapuse::HeapSize::heap_size(&self.field_f32)
+            + ::heapuse::HeapSize::heap_size(&self.field_f64)
+    }
+}
+fn main() {}

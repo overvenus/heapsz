@@ -1,10 +1,12 @@
 use heapuse_derive::Heap;
-use heapuse_example::*;
+
+#[path = "../../../heapuse/examples/allowlisting.rs"]
+mod allowlisting;
 
 #[derive(Heap)]
 pub struct WrongAttr {
     #[heap_size(with)]
-    pub a: primitive::StructPrimitives,
+    pub a: allowlisting::FullAllow,
 }
 
 fn main() {}

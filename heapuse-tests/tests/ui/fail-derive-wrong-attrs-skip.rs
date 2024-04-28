@@ -1,10 +1,12 @@
 use heapuse_derive::Heap;
-use heapuse_example::*;
+
+#[path = "../../../heapuse/examples/allowlisting.rs"]
+mod allowlisting;
 
 #[derive(Heap)]
 pub struct WrongSkip1 {
     #[heap_size(skip)]
-    pub a: primitive::StructPrimitives,
+    pub a: allowlisting::FullAllow,
 }
 
 #[derive(Heap)]
