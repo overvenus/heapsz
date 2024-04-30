@@ -2,4 +2,4 @@
 
 set -euo pipefail
 
-RUSTDOCFLAGS="--cfg docsrs" cargo doc --verbose
+RUSTDOCFLAGS="--cfg docsrs" cargo doc

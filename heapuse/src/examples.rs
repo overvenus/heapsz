@@ -7,7 +7,7 @@ macro_rules! decl_mod {
         $(
             decl_mod! {
                 origin concat!("../examples/", stringify!($name),".rs"),
-                expand concat!("../../heapuse-tests/tests/expand/", stringify!($name),".stdout"),
+                expand concat!("../tests/expand/", stringify!($name),".stdout"),
                 mod $name
             }
         )+

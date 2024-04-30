@@ -1,11 +1,11 @@
 use heapuse_derive::Heap;
 
-#[path = "../../../heapuse/examples/allowlisting.rs"]
+#[path = "../../examples/allowlisting.rs"]
 mod allowlisting;
 
 #[derive(Heap)]
-pub struct WrongAttr {
-    #[heap_size(with)]
+pub struct UnknownAttr {
+    #[heap_size(unknown)]
     pub a: allowlisting::FullAllow,
 }
 

@@ -79,6 +79,8 @@ name = "heapuse"
 version = "0.1.0"
 dependencies = [
  "heapuse-derive",
+ "snapbox",
+ "trybuild",
 ]
 
 [[package]]
@@ -88,16 +90,6 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn",
-]
-
-[[package]]
-name = "heapuse-tests"
-version = "0.1.0"
-dependencies = [
- "heapuse",
- "heapuse-derive",
- "snapbox",
- "trybuild",
 ]
 
 [[package]]

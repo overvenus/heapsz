@@ -1,6 +1,6 @@
 use heapuse_derive::Heap;
 
-#[path = "../../../heapuse/examples/allowlisting.rs"]
+#[path = "../../examples/allowlisting.rs"]
 mod allowlisting;
 
 #[derive(Heap)]

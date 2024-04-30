@@ -4,7 +4,7 @@ use std::{fs::read_dir, path::Path};
 fn expand_examples() {
     let current_path = snapbox::current_dir!();
     println!("current_path: {}", current_path.display());
-    let example_dir = current_path.join("../../heapuse/examples");
+    let example_dir = current_path.join("../examples");
     let dir = read_dir(example_dir).unwrap();
     for entry in dir {
         let entry = entry.unwrap();
