@@ -10,11 +10,11 @@ error[E0277]: the trait bound `NoneHeapSize: HeapSize` is not satisfied
    |
    = help: the following other types implement trait `HeapSize`:
              bool
+             char
              isize
              i8
              i16
              i32
              i64
              i128
-             usize
            and $N others
