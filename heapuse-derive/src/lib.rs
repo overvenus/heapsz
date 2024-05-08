@@ -144,7 +144,7 @@ impl HeapField {
     ) -> Result<Option<Self>> {
         let require_container_attr = |meta| {
             if let Some(HeapAttr::Container(_)) = container_attr {
-                return Ok(None);
+                Ok(None)
             } else {
                 bail!(
                     meta,
@@ -338,7 +338,7 @@ fn render_enum_variant(var: Variant, container_attr: Option<&HeapAttr>) -> Resul
     let mut heap_sizes = vec![];
     for (i, field) in fields.into_iter().enumerate() {
         if let Some(f) =
-            HeapField::new(i, field.clone(), container_attr.clone(), var_attrs.as_ref())?
+            HeapField::new(i, field.clone(), container_attr, var_attrs.as_ref())?
         {
             heap_sizes.push(f.method_heap_size(&self_receivers[i])?);
         }
