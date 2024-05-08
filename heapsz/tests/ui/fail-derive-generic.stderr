@@ -1,0 +1,14 @@
+error[E0277]: the trait bound `T: HeapSize` is not satisfied
+ --> tests/ui/fail-derive-generic.rs:3:10
+  |
+3 |   #[derive(HeapSize)]
+  |            ^^^^^^^^ the trait `HeapSize` is not implemented for `T`
+4 |   pub struct G1<T> {
+5 | /     #[heap_size]
+6 | |     pub a: T,
+  | |____________- required by a bound introduced by this call
+  |
+help: consider restricting type parameter `T`
+  |
+4 | pub struct G1<T: heapsz::HeapSize> {
+  |                ++++++++++++++++++
