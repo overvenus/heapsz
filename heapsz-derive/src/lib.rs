@@ -271,16 +271,23 @@ fn render_enum(input: DeriveInput) -> Result<TokenStream> {
     for var in data.variants {
         rendered_vars.push(render_enum_variant(var, container_attrs.as_ref())?);
     }
+    let matches = if rendered_vars.is_empty() {
+        quote!(0)
+    } else {
+        quote! {
+            #[allow(unused_variables)]
+            match self {
+                #(#rendered_vars)*
+            }
+        }
+    };
 
     let generics = &input.generics;
     let (impl_generics, ty_generics, where_clause) = generics.split_for_impl();
     Ok(quote! {
         impl #impl_generics ::heapsz::HeapSize for #ident #ty_generics #where_clause {
             fn heap_size(&self) -> usize {
-                #[allow(unused_variables)]
-                match self {
-                    #(#rendered_vars)*
-                }
+                #matches
             }
         }
     })
@@ -337,9 +344,7 @@ fn render_enum_variant(var: Variant, container_attr: Option<&HeapAttr>) -> Resul
 
     let mut heap_sizes = vec![];
     for (i, field) in fields.into_iter().enumerate() {
-        if let Some(f) =
-            HeapField::new(i, field.clone(), container_attr, var_attrs.as_ref())?
-        {
+        if let Some(f) = HeapField::new(i, field.clone(), container_attr, var_attrs.as_ref())? {
             heap_sizes.push(f.method_heap_size(&self_receivers[i])?);
         }
     }

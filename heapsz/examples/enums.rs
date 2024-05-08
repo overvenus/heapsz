@@ -20,7 +20,7 @@ pub enum Enum {
 
 #[derive(heapsz_derive::HeapSize)]
 #[heap_size]
-pub enum EnumAll {
+pub enum All {
     A(usize),
     B(usize, usize),
     C(#[heap_size(with = "remote_inner_heap_size")] Inner, usize),
@@ -34,7 +34,7 @@ pub enum EnumAll {
 
 #[derive(heapsz_derive::HeapSize)]
 #[heap_size]
-pub enum EnumSkip {
+pub enum Skip {
     A(#[heap_size(skip)] Inner, usize),
     B {
         #[heap_size(skip)]
@@ -46,6 +46,17 @@ pub enum EnumSkip {
     C {
         inner: Inner,
     },
+}
+
+#[derive(heapsz_derive::HeapSize)]
+#[heap_size]
+pub enum Empty {}
+
+#[derive(heapsz_derive::HeapSize)]
+#[heap_size]
+pub enum Numbers {
+    A = 1,
+    B = 2,
 }
 
 fn main() {}

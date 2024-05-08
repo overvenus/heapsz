@@ -55,7 +55,7 @@ impl ::heapsz::HeapSize for Enum {
     }
 }
 #[heap_size]
-pub enum EnumAll {
+pub enum All {
     A(usize),
     B(usize, usize),
     C(#[heap_size(with = "remote_inner_heap_size")] Inner, usize),
@@ -66,7 +66,7 @@ pub enum EnumAll {
         size2: usize,
     },
 }
-impl ::heapsz::HeapSize for EnumAll {
+impl ::heapsz::HeapSize for All {
     fn heap_size(&self) -> usize {
         #[allow(unused_variables)]
         match self {
@@ -88,13 +88,13 @@ impl ::heapsz::HeapSize for EnumAll {
     }
 }
 #[heap_size]
-pub enum EnumSkip {
+pub enum Skip {
     A(#[heap_size(skip)] Inner, usize),
     B { #[heap_size(skip)] inner: Inner, size1: usize, size2: usize },
     #[heap_size(skip)]
     C { inner: Inner },
 }
-impl ::heapsz::HeapSize for EnumSkip {
+impl ::heapsz::HeapSize for Skip {
     fn heap_size(&self) -> usize {
         #[allow(unused_variables)]
         match self {
@@ -104,6 +104,27 @@ impl ::heapsz::HeapSize for EnumSkip {
                     + ::heapsz::HeapSize::heap_size(size2)
             }
             Self::C { inner } => 0,
+        }
+    }
+}
+#[heap_size]
+pub enum Empty {}
+impl ::heapsz::HeapSize for Empty {
+    fn heap_size(&self) -> usize {
+        0
+    }
+}
+#[heap_size]
+pub enum Numbers {
+    A = 1,
+    B = 2,
+}
+impl ::heapsz::HeapSize for Numbers {
+    fn heap_size(&self) -> usize {
+        #[allow(unused_variables)]
+        match self {
+            Self::A => 0,
+            Self::B => 0,
         }
     }
 }

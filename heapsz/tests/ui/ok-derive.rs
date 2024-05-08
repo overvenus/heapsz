@@ -76,4 +76,15 @@ pub enum E3 {
     },
 }
 
+#[derive(HeapSize)]
+#[heap_size]
+pub enum E4 {}
+
+#[derive(HeapSize)]
+#[heap_size]
+pub enum E5 {
+    A = 0,
+    B = 1,
+}
+
 fn main() {}
