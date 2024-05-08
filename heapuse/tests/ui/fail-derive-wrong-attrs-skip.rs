@@ -1,15 +1,15 @@
-use heapuse_derive::Heap;
+use heapuse_derive::HeapSize;
 
 #[path = "../../examples/allowlisting.rs"]
 mod allowlisting;
 
-#[derive(Heap)]
+#[derive(HeapSize)]
 pub struct WrongSkip1 {
     #[heap_size(skip)]
     pub a: allowlisting::FullAllow,
 }
 
-#[derive(Heap)]
+#[derive(HeapSize)]
 pub enum WrongSkip2 {
     #[heap_size(skip)]
     A(usize),

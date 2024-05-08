@@ -3,7 +3,7 @@
 use std::prelude::rust_2021::*;
 #[macro_use]
 extern crate std;
-use heapuse_derive::Heap;
+use heapuse_derive::HeapSize;
 pub struct Blank {
     pub field_bool: bool,
     pub field_u8: u8,

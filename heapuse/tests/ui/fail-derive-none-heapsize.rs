@@ -1,10 +1,10 @@
-use heapuse_derive::Heap;
+use heapuse_derive::HeapSize;
 
 struct NoneHeapSize {
     a: (),
 }
 
-#[derive(Heap)]
+#[derive(HeapSize)]
 pub struct BadStruct {
     #[heap_size]
     pub a: NoneHeapSize,

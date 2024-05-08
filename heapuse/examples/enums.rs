@@ -4,7 +4,7 @@ use with::{remote::*, *};
 #[path = "with.rs"]
 mod with;
 
-#[derive(heapuse_derive::Heap)]
+#[derive(heapuse_derive::HeapSize)]
 pub enum Enum {
     A(#[heap_size] usize),
     B(#[heap_size] usize, usize),
@@ -18,7 +18,7 @@ pub enum Enum {
     },
 }
 
-#[derive(heapuse_derive::Heap)]
+#[derive(heapuse_derive::HeapSize)]
 #[heap_size]
 pub enum EnumAll {
     A(usize),
@@ -32,7 +32,7 @@ pub enum EnumAll {
     },
 }
 
-#[derive(heapuse_derive::Heap)]
+#[derive(heapuse_derive::HeapSize)]
 #[heap_size]
 pub enum EnumSkip {
     A(#[heap_size(skip)] Inner, usize),

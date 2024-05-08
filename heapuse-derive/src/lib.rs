@@ -15,7 +15,7 @@ const HEAP_ATTR_WITH_IDENT: &str = "with";
 // #[heap_size(skip)] Field attributes
 const HEAP_ATTR_SKIP_IDENT: &str = "skip";
 
-#[proc_macro_derive(Heap, attributes(heap_size))]
+#[proc_macro_derive(HeapSize, attributes(heap_size))]
 pub fn heap(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
     let input: DeriveInput = syn::parse(input).unwrap();
 

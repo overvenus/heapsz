@@ -1,6 +1,6 @@
-use heapuse_derive::Heap;
+use heapuse_derive::HeapSize;
 
-#[derive(Heap)]
+#[derive(HeapSize)]
 pub struct FullAllow {
     #[heap_size]
     pub field_bool: bool,
@@ -22,7 +22,7 @@ pub struct FullAllow {
     pub field_f64: f64,
 }
 
-#[derive(Heap)]
+#[derive(HeapSize)]
 pub struct PartialAllow {
     #[heap_size]
     pub field_bool: bool,

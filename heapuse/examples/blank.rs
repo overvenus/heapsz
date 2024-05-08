@@ -1,6 +1,6 @@
-use heapuse_derive::Heap;
+use heapuse_derive::HeapSize;
 
-#[derive(Heap)]
+#[derive(HeapSize)]
 pub struct Blank {
     pub field_bool: bool,
     pub field_u8: u8,

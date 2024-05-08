@@ -1,6 +1,6 @@
-use heapuse_derive::Heap;
+use heapuse_derive::HeapSize;
 
-#[derive(Heap)]
+#[derive(HeapSize)]
 pub struct G1<T> {
     #[heap_size]
     pub a: T,

@@ -1,9 +1,9 @@
-use heapuse_derive::Heap;
+use heapuse_derive::HeapSize;
 
 #[path = "../../examples/allowlisting.rs"]
 mod allowlisting;
 
-#[derive(Heap)]
+#[derive(HeapSize)]
 pub struct UnknownAttr {
     #[heap_size]
     #[heap_size(with = "mod::a")]

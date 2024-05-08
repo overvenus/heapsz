@@ -3,11 +3,11 @@
 use std::prelude::rust_2021::*;
 #[macro_use]
 extern crate std;
-use heapuse_derive::Heap;
+use heapuse_derive::HeapSize;
 #[allow(dead_code)]
 #[path = "allowlisting.rs"]
 mod allowlisting {
-    use heapuse_derive::Heap;
+    use heapuse_derive::HeapSize;
     pub struct FullAllow {
         #[heap_size]
         pub field_bool: bool,

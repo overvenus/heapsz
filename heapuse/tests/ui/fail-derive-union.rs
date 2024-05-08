@@ -1,6 +1,6 @@
-use heapuse_derive::Heap;
+use heapuse_derive::HeapSize;
 
-#[derive(Heap)]
+#[derive(HeapSize)]
 union Union {
     f1: u32,
     f2: f32,

@@ -12,8 +12,8 @@ pub mod remote_inner_heap_size {
     }
 }
 
-#[derive(heapuse_derive::Heap)]
-pub struct Wtih {
+#[derive(heapuse_derive::HeapSize)]
+pub struct With {
     #[heap_size(with = "remote_inner_heap_size")]
     pub inner: remote::Inner,
 }

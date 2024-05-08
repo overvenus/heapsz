@@ -17,11 +17,11 @@ mod with {
             t.0.heap_size()
         }
     }
-    pub struct Wtih {
+    pub struct With {
         #[heap_size(with = "remote_inner_heap_size")]
         pub inner: remote::Inner,
     }
-    impl ::heapuse::HeapSize for Wtih {
+    impl ::heapuse::HeapSize for With {
         fn heap_size(&self) -> usize {
             0 + remote_inner_heap_size::heap_size(&self.inner)
         }

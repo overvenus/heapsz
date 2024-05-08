@@ -1,6 +1,6 @@
-use heapuse_derive::Heap;
+use heapuse_derive::HeapSize;
 
-#[derive(Heap)]
+#[derive(HeapSize)]
 #[heap_size]
 pub struct FullBlock {
     #[heap_size(skip)]
@@ -23,7 +23,7 @@ pub struct FullBlock {
     pub field_f64: f64,
 }
 
-#[derive(Heap)]
+#[derive(HeapSize)]
 #[heap_size]
 pub struct PartialBlock {
     #[heap_size(skip)]

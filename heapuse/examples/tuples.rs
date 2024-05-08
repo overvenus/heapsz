@@ -1,16 +1,16 @@
-use heapuse_derive::Heap;
+use heapuse_derive::HeapSize;
 
 #[allow(dead_code)]
 #[path = "allowlisting.rs"]
 mod allowlisting;
 
-#[derive(Heap)]
+#[derive(HeapSize)]
 pub struct Unit;
 
-#[derive(Heap)]
+#[derive(HeapSize)]
 pub struct Tuple1(#[heap_size] allowlisting::FullAllow);
 
-#[derive(Heap)]
+#[derive(HeapSize)]
 #[heap_size]
 pub struct Tuple2(
     allowlisting::FullAllow,
