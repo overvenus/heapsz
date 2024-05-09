@@ -27,3 +27,9 @@ mod allocs;
 
 // Implement `HeapSize` for structs in the std crate.
 mod stds;
+
+#[cfg(feature = "bytes")]
+mod bytes;
+
+#[cfg(feature = "protobuf2")]
+mod protobuf2;

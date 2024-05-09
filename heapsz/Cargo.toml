@@ -4,7 +4,13 @@ version = "0.1.0"
 edition = "2021"
 license = "MIT"
 
+[features]
+bytes = ["dep:bytes"]
+protobuf2 = ["dep:protobuf2"]
+
 [dependencies]
+bytes = { version = "*", optional = true }
+protobuf2 = { package = "protobuf", version = "2", optional = true }
 
 [dev-dependencies]
 heapsz-derive = { path = "../heapsz-derive" }
