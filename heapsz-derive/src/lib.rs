@@ -53,17 +53,23 @@ impl HeapAttr {
     ) -> Result<Option<Self>> {
         let mut attrs = vec![];
         for attr in raw_attrs {
-            if let Meta::List(meta_list) = &attr.meta {
-                if meta_list.path.is_ident(HEAP_IDENT) {
-                    let heap_attrs = meta_list
-                        .parse_args_with(Punctuated::<Meta, Token![,]>::parse_terminated)?;
-                    if heap_attrs.len() > 1 {
-                        bail!(meta_list, "too many heap_size attributes");
+            match &attr.meta {
+                Meta::List(meta_list) => {
+                    if meta_list.path.is_ident(HEAP_IDENT) {
+                        let heap_attrs = meta_list
+                            .parse_args_with(Punctuated::<Meta, Token![,]>::parse_terminated)?;
+                        if heap_attrs.len() > 1 {
+                            bail!(meta_list, "too many heap_size attributes");
+                        }
+                        attrs.extend(heap_attrs);
                     }
-                    attrs.extend(heap_attrs);
                 }
-            } else {
-                attrs.push(attr.meta.clone());
+                Meta::Path(path) => {
+                    if path.is_ident(HEAP_IDENT) {
+                        attrs.push(attr.meta.clone());
+                    }
+                }
+                _ => (),
             }
         }
         let meta = if attrs.is_empty() {
