@@ -23,6 +23,16 @@ mod vec_box_string {
         }
     }
 
+    impl<T: crate::HeapSize> crate::HeapSize for alloc::boxed::Box<[T]> {
+        fn heap_size(&self) -> usize {
+            if self.is_empty() {
+                0
+            } else {
+                self.len() * T::memory_size(&self[0])
+            }
+        }
+    }
+
     impl crate::HeapSize for alloc::string::String {
         fn heap_size(&self) -> usize {
             self.capacity()
@@ -143,6 +153,16 @@ mod sync {
         fn heap_size(&self) -> usize {
             // Arc is a pointer to a Box<T>, so the entire T is in heap.
             T::memory_size(self.as_ref())
+        }
+    }
+
+    impl<T: crate::HeapSize> crate::HeapSize for alloc::sync::Arc<[T]> {
+        fn heap_size(&self) -> usize {
+            if self.is_empty() {
+                0
+            } else {
+                self.len() * T::memory_size(&self[0])
+            }
         }
     }
 

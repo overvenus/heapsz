@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 use heapsz::HeapSize;
 use heapsz_derive::HeapSize;
 
@@ -46,6 +48,10 @@ pub struct A1<T: HeapSize> {
     #[heap_size]
     pub a: Vec<T>,
     pub b: Vec<T>,
+    pub c: Box<[T]>,
+    pub d: Box<[T; 5]>,
+    pub e: Arc<[T]>,
+    pub f: Arc<[T; 5]>,
 }
 
 #[derive(HeapSize)]
