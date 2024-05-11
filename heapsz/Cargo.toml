@@ -4,6 +4,10 @@ version = "0.1.0"
 edition = "2021"
 license = "MIT"
 readme = "README.md"
+authors = ["Neil Shen <overvenus@gmail.com>"]
+repository = "https://github.com/overvenus/heapsz"
+description = "A crate for calculating the heap usage of a data structure."
+documentation = "https://docs.rs/heapsz"
 
 [features]
 bytes = ["dep:bytes"]
