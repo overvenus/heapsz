@@ -1,14 +1,13 @@
 mod hash {
-    impl crate::HeapSize for std::hash::RandomState {
-        fn heap_size(&self) -> usize {
-            0
-        }
-    }
+    impl_heap_size! {zero std::hash::RandomState,}
 }
+
 mod collections {
     use std::{collections, mem};
 
-    impl<K: crate::HeapSize, V: crate::HeapSize, S> crate::HeapSize for collections::HashMap<K, V, S> {
+    use crate::HeapSize;
+
+    impl<K: HeapSize, V: HeapSize, S> HeapSize for collections::HashMap<K, V, S> {
         fn heap_size(&self) -> usize {
             let cap_bytes = self.capacity() * (mem::size_of::<K>() + mem::size_of::<V>());
             if self.is_empty() {
@@ -22,7 +21,7 @@ mod collections {
         }
     }
 
-    impl<T: crate::HeapSize, S> crate::HeapSize for collections::HashSet<T, S> {
+    impl<T: HeapSize, S> HeapSize for collections::HashSet<T, S> {
         fn heap_size(&self) -> usize {
             let cap_bytes = self.capacity() * mem::size_of::<T>();
             if self.is_empty() {
@@ -35,19 +34,58 @@ mod collections {
             }
         }
     }
+
+    #[test]
+    fn test_hash_map() {
+        let mut map = collections::HashMap::with_capacity(10);
+        map.insert(0u64, Box::new([0u64; 32]));
+        assert_eq!(
+            (map.capacity() * (mem::size_of::<u64>() + mem::size_of::<Box<[u64; 32]>>()))
+                + mem::size_of::<[u64; 32]>(),
+            map.heap_size()
+        );
+    }
+
+    #[test]
+    fn test_hash_set() {
+        let mut set = collections::HashSet::with_capacity(10);
+        set.insert(Box::new([0u64; 32]));
+        assert_eq!(
+            (set.capacity() * mem::size_of::<Box<[u64; 32]>>()) + mem::size_of::<[u64; 32]>(),
+            set.heap_size()
+        );
+    }
 }
 
 mod io {
-    impl<T> crate::HeapSize for std::io::BufReader<T> {
+    use crate::HeapSize;
+
+    impl<T: ?Sized> HeapSize for std::io::BufReader<T> {
         fn heap_size(&self) -> usize {
             self.capacity()
         }
     }
 
-    impl<T: ?Sized + std::io::Write> crate::HeapSize for std::io::BufWriter<T> {
+    impl<T: ?Sized + std::io::Write> HeapSize for std::io::BufWriter<T> {
         fn heap_size(&self) -> usize {
             self.capacity()
         }
+    }
+
+    #[test]
+    fn test_buf_reader() {
+        let s = std::io::BufReader::new(std::io::empty());
+        assert_eq!(s.capacity(), s.heap_size());
+        let s = std::io::BufReader::with_capacity(10, std::io::empty());
+        assert_eq!(s.capacity(), s.heap_size());
+    }
+
+    #[test]
+    fn test_buf_writer() {
+        let s = std::io::BufWriter::new(std::io::empty());
+        assert_eq!(s.capacity(), s.heap_size());
+        let s = std::io::BufWriter::with_capacity(10, std::io::empty());
+        assert_eq!(s.capacity(), s.heap_size());
     }
 }
 
@@ -62,20 +100,34 @@ mod net {
 }
 
 mod path {
+    use crate::HeapSize;
+
     impl_heap_size! {
         zero
         std::path::Path,
     }
 
-    impl crate::HeapSize for std::path::PathBuf {
+    impl HeapSize for std::path::PathBuf {
         fn heap_size(&self) -> usize {
             self.capacity()
         }
     }
+
+    #[test]
+    fn test() {
+        let s = std::path::PathBuf::new();
+        assert_eq!(s.capacity(), s.heap_size());
+        let s = std::path::PathBuf::with_capacity(10);
+        assert_eq!(s.capacity(), s.heap_size());
+    }
 }
 
 mod sync {
-    impl<T: crate::HeapSize> crate::HeapSize for std::sync::Mutex<T> {
+    use std::sync::{Mutex, RwLock};
+
+    use crate::HeapSize;
+
+    impl<T: HeapSize> HeapSize for Mutex<T> {
         /// Return the number of bytes it owns in heap.
         ///
         /// # Panics
@@ -88,7 +140,7 @@ mod sync {
         }
     }
 
-    impl<T: crate::HeapSize> crate::HeapSize for std::sync::RwLock<T> {
+    impl<T: HeapSize> HeapSize for RwLock<T> {
         /// Return the number of bytes it owns in heap.
         ///
         /// # Panics
@@ -100,6 +152,24 @@ mod sync {
             T::memory_size(&*self.read().unwrap())
         }
     }
+
+    #[test]
+    fn test_mutex() {
+        let s = Mutex::new([0u64; 32]);
+        assert_eq!([0u64; 32].memory_size(), s.heap_size());
+
+        let s = Mutex::new(Box::new([0u64; 32]));
+        assert_eq!(HeapSize::memory_size(&Box::new([0u64; 32])), s.heap_size());
+    }
+
+    #[test]
+    fn test_rwlock() {
+        let s = RwLock::new([0u64; 32]);
+        assert_eq!([0u64; 32].memory_size(), s.heap_size());
+
+        let s = RwLock::new(Box::new([0u64; 32]));
+        assert_eq!(HeapSize::memory_size(&Box::new([0u64; 32])), s.heap_size());
+    }
 }
 
 mod time {
@@ -108,4 +178,45 @@ mod time {
         std::time::Instant,
         std::time::SystemTime,
     }
+
+    #[test]
+    fn test() {
+        use crate::HeapSize;
+        let s = std::time::Instant::now();
+        assert_eq!(0, s.heap_size());
+        let s = std::time::Duration::default();
+        assert_eq!(0, s.heap_size());
+    }
+}
+
+#[test]
+fn test_heap_size() {
+    use std::collections::HashMap;
+
+    use crate::HeapSize;
+
+    let mut vu8 = Vec::with_capacity(16);
+    assert_eq!(vu8.heap_size(), 16);
+    vu8.extend([1u8, 2, 3]);
+    assert_eq!(vu8.heap_size(), 16);
+
+    let ovu8 = Some(vu8);
+    assert_eq!(ovu8.heap_size(), 16);
+
+    let ovu82 = (ovu8, Some(Vec::<u8>::with_capacity(16)));
+    assert_eq!(ovu82.heap_size(), 16 * 2);
+
+    let mut mu8u64 = HashMap::<u8, u64>::default();
+    mu8u64.reserve(16);
+    assert_eq!(mu8u64.heap_size(), mu8u64.capacity() * (1 + 8));
+
+    let mut mu8vu64 = HashMap::<u8, Vec<u64>>::default();
+    mu8vu64.reserve(16);
+    mu8vu64.insert(1, Vec::with_capacity(2));
+    mu8vu64.insert(2, Vec::with_capacity(2));
+    assert_eq!(
+        mu8vu64.heap_size(),
+        mu8vu64.capacity() * (1 + std::mem::size_of::<Vec<u64>>())
+            + 2 * (Vec::<u64>::with_capacity(2).heap_size())
+    );
 }
