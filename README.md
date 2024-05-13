@@ -16,7 +16,7 @@ It's fast. It estimates an approximate heap size in O(1) time.
 **Calculate `heap_size()` selectively**
 
 <table>
-<tr><th> Example </th><th> Expended example </th></tr>
+<tr><th> Example </th><th> Expanded example </th></tr>
 <tr><td>
 
 ```rust
@@ -49,9 +49,9 @@ impl HeapSize for  Foo {
 <!-- Begin **Calculate `heap_size()` of all fields** -->
 
 <details>
-<summary><b>Calculate `heap_size()` of all fields</b></summary>
+<summary><b>Calculate <code>heap_size()</code> of all fields</b></summary>
 <table>
-<tr><th> Example </th><th> Expended example </th></tr>
+<tr><th> Example </th><th> Expanded example </th></tr>
 <tr><td>
 
 ```rust
@@ -89,7 +89,7 @@ impl HeapSize for  Foo {
 <details>
 <summary><b>Skip irrelative fields</b></summary>
 <table>
-<tr><th> Example </th><th> Expended example </th></tr>
+<tr><th> Example </th><th> Expanded example </th></tr>
 <tr><td>
 
 ```rust
@@ -125,14 +125,18 @@ impl HeapSize for  Foo {
 <!-- Begin **Implement HeapSize for third-party struct** -->
 
 <details>
-<summary><b>Implement HeapSize for third-party struct</b></summary>
+<summary><b>Implement HeapSize for third-party structs</b></summary>
 <table>
-<tr><th> Example </th><th> Expended example </th></tr>
+<tr><th> Example </th><th> Expanded example </th></tr>
 <tr><td>
 
 ```rust
 mod bytes_heap_size {
-    pub heap_size(b: &Bytes) -> usize { b.len() }
+    pub heap_size(
+        b: &Bytes
+    ) -> usize {
+        b.len()
+    }
 }
 
 #[derive(HeapSize)]
@@ -217,4 +221,4 @@ Apply to a variant of an enum.
 
 ## License
 
-This project is licensed under the [MIT license](LICENSE).
+This project is licensed under the [MIT license](https://github.com/overvenus/heapsz/blob/main/LICENSE).

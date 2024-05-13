@@ -1,14 +1,14 @@
+#![doc = include_str!("../README.md")]
+
 #[cfg(docsrs)]
 pub mod examples;
 
 /// Query the number of bytes of an object.
 pub trait HeapSize {
-    /// Return the number of bytes it owns in heap.
-    ///
-    /// N.B. the implementation should be performant, as it is often called on
-    /// performance critical path.
+    /// Return the number of bytes it owns on the heap.
     fn heap_size(&self) -> usize;
 
+    /// Return the number of bytes it owns on both the heap and the stack.
     fn memory_size(&self) -> usize
     where
         Self: Sized,
