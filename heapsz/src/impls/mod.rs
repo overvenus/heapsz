@@ -1,4 +1,17 @@
 macro_rules! impl_heap_size{
+    ( zero gen_test $($typ: ty,)+ ) => {
+        impl_heap_size!{
+            zero $($typ,)+
+        }
+        #[test]
+        fn test() {
+            use $crate::HeapSize;
+            $({
+                let v = <$typ as Default>::default();
+                assert_eq!(0, v.heap_size());
+            })+
+        }
+    };
     ( zero $($typ: ty,)+ ) => {
         $(
             impl $crate::HeapSize for $typ {
