@@ -1,0 +1,64 @@
+name: CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+env:
+  CARGO_TERM_COLOR: always
+  RUSTFLAGS: -Dwarnings
+
+jobs:
+  test:
+    name: Test suite
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@master
+        with:
+            toolchain: nightly-2024-05-13
+            components: rustfmt
+      - run: cargo fmt --check
+      - run: cargo install cargo-expand@1.0.86
+      - run: cargo test --all-features
+
+  build:
+    name: Rust ${{matrix.rust}}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        rust: [stable, nightly]
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: ${{matrix.rust}}
+      - run: cargo build --all-features
+
+  doc:
+    name: Documentation
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      RUSTDOCFLAGS: -Dwarnings
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@nightly
+      - run: cargo version && rustc -V
+      - run: ./scripts/generate-docs
+
+  clippy:
+    name: Clippy
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@clippy
+        with:
+            components: clippy
+      - run: cargo clippy -- -Dclippy::all -Dclippy::pedantic

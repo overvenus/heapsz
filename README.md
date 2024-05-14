@@ -19,10 +19,10 @@ It's fast. It estimates an approximate heap size in O(1) time.
 <tr><th> Example </th><th> Expanded example </th></tr>
 <tr><td>
 
-```rust
+```rust,ignore
 #[derive(HeapSize)]
 struct Foo {
-    a: usize
+    a: usize,
     b: Option<u64>,
     #[heap_size]
     c: Box<[usize; 5]>,
@@ -33,8 +33,8 @@ struct Foo {
 
 </td><td>
 
-```rust
-impl HeapSize for  Foo {
+```rust,ignore
+impl HeapSize for Foo {
     fn heap_size(&self) -> usize {
         self.c.heap_size() + self.d.heap_size()
     }
@@ -54,11 +54,11 @@ impl HeapSize for  Foo {
 <tr><th> Example </th><th> Expanded example </th></tr>
 <tr><td>
 
-```rust
+```rust,ignore
 #[derive(HeapSize)]
 #[heap_size]
 struct Foo {
-    a: usize
+    a: usize,
     b: Option<u64>,
     c: Box<[usize; 5]>,
     d: Vec<usize>,
@@ -67,8 +67,8 @@ struct Foo {
 
 </td><td>
 
-```rust
-impl HeapSize for  Foo {
+```rust,ignore
+impl HeapSize for Foo {
     fn heap_size(&self) -> usize {
         self.a.heap_size()
             + self.b.heap_size()
@@ -92,11 +92,11 @@ impl HeapSize for  Foo {
 <tr><th> Example </th><th> Expanded example </th></tr>
 <tr><td>
 
-```rust
+```rust,ignore
 #[derive(HeapSize)]
 #[heap_size]
 struct Foo {
-    a: usize
+    a: usize,
     b: Option<u64>,
     #[heap_size(skip)]
     c: Arc<[usize; 5]>,
@@ -106,8 +106,8 @@ struct Foo {
 
 </td><td>
 
-```rust
-impl HeapSize for  Foo {
+```rust,ignore
+impl HeapSize for Foo {
     fn heap_size(&self) -> usize {
         self.a.heap_size()
             + self.b.heap_size()
@@ -130,7 +130,7 @@ impl HeapSize for  Foo {
 <tr><th> Example </th><th> Expanded example </th></tr>
 <tr><td>
 
-```rust
+```rust,ignore
 mod bytes_heap_size {
     pub heap_size(
         b: &Bytes
@@ -142,7 +142,7 @@ mod bytes_heap_size {
 #[derive(HeapSize)]
 #[heap_size]
 struct Foo {
-    a: usize
+    a: usize,
     b: Option<u64>,
     c: Box<[usize; 5]>,
     d: Bytes,
@@ -151,8 +151,8 @@ struct Foo {
 
 </td><td>
 
-```rust
-impl HeapSize for  Foo {
+```rust,ignore
+impl HeapSize for Foo {
     fn heap_size(&self) -> usize {
         self.a.heap_size()
             + self.b.heap_size()

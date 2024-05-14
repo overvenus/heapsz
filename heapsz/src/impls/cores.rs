@@ -16,12 +16,12 @@ mod primitive {
 
     impl<T: HeapSize, const N: usize> HeapSize for [T; N] {
         fn heap_size(&self) -> usize {
-            if !self.is_empty() {
+            if self.is_empty() {
+                0
+            } else {
                 // Prefer an approximation of its actually heap size, because we
                 // want the time complexity to be O(1).
                 self.len() * self[0].heap_size()
-            } else {
-                0
             }
         }
     }
@@ -165,7 +165,7 @@ mod option_result {
     impl<T: HeapSize, E> HeapSize for Result<T, E> {
         /// Return the number of bytes it owns in heap.
         ///
-        /// Note: Err heap_size is ignored because, in most use cases, we only
+        /// Note: Err heap size is ignored because, in most use cases, we only
         /// care about the Ok variant.
         fn heap_size(&self) -> usize {
             match self {

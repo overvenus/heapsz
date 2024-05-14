@@ -8,13 +8,13 @@ mod allowlisting;
 pub struct Unit;
 
 #[derive(HeapSize)]
-pub struct Tuple1(#[heap_size] allowlisting::FullAllow);
+pub struct Tuple1(#[heap_size] pub allowlisting::FullAllow);
 
 #[derive(HeapSize)]
 #[heap_size]
 pub struct Tuple2(
-    allowlisting::FullAllow,
-    #[heap_size(skip)] allowlisting::PartialAllow,
+    pub allowlisting::FullAllow,
+    #[heap_size(skip)] pub allowlisting::PartialAllow,
 );
 
 fn main() {}

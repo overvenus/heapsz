@@ -19,7 +19,10 @@ const HEAP_ATTR_SKIP_IDENT: &str = "skip";
 
 #[proc_macro_derive(HeapSize, attributes(heap_size))]
 pub fn heap(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
-    let input: DeriveInput = syn::parse(input).unwrap();
+    let input: DeriveInput = match syn::parse(input) {
+        Ok(v) => v,
+        Err(e) => return e.into_compile_error().into(),
+    };
 
     let tokens = match input.data {
         Data::Struct(..) => render_struct(input),
@@ -29,7 +32,7 @@ pub fn heap(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
             "`Heap` can not be derived for a union",
         )),
     };
-    tokens.unwrap_or_else(|e| e.into_compile_error()).into()
+    tokens.unwrap_or_else(syn::Error::into_compile_error).into()
 }
 
 type Result<T> = result::Result<T, syn::Error>;
@@ -40,9 +43,13 @@ macro_rules! bail {
 }
 
 enum HeapAttr {
+    // #[heap_size] on a struct or enum.
     Container(Meta),
-    Field(Meta),
+    // #[heap_size] on a field.
+    Field,
+    // #[heap_size(with = "")] on a field.
     FieldWith(Meta, LitStr),
+    // #[heap_size(skip)] on a field.
     FieldSkip(Meta),
 }
 
@@ -71,7 +78,7 @@ impl HeapAttr {
                         attrs.push(attr.meta.clone());
                     }
                 }
-                _ => (),
+                Meta::NameValue(_) => (),
             }
         }
         let meta = if attrs.is_empty() {
@@ -86,7 +93,7 @@ impl HeapAttr {
             Meta::Path(ref name) => {
                 if name.is_ident(HEAP_IDENT) {
                     if is_field {
-                        Ok(Some(HeapAttr::Field(meta)))
+                        Ok(Some(HeapAttr::Field))
                     } else {
                         Ok(Some(HeapAttr::Container(meta)))
                     }
@@ -165,8 +172,8 @@ impl HeapField {
             None => {
                 if let Some(HeapAttr::FieldSkip(meta)) = variant_attr {
                     return require_container_attr(meta);
-                } else if let Some(HeapAttr::Container(ref meta)) = container_attr {
-                    HeapAttr::Field(meta.clone())
+                } else if let Some(HeapAttr::Container(_)) = container_attr {
+                    HeapAttr::Field
                 } else {
                     return Ok(None);
                 }
@@ -175,13 +182,16 @@ impl HeapField {
             Some(attr) => attr,
         };
 
-        let ident = field.ident.clone().map(|x| quote!(#x)).unwrap_or_else(|| {
-            let index = Index {
-                index: index as u32,
-                span: Span::call_site(),
-            };
-            quote!(#index)
-        });
+        let ident = field.ident.clone().map_or_else(
+            || {
+                let index = Index {
+                    index: u32::try_from(index).unwrap(),
+                    span: Span::call_site(),
+                };
+                quote!(#index)
+            },
+            |x| quote!(#x),
+        );
 
         Ok(Some(HeapField { attr, ident, field }))
     }
@@ -198,7 +208,7 @@ impl HeapField {
             }
         };
         match self.attr {
-            HeapAttr::Field(_) => Ok(quote_spanned! {self.field.span()=>
+            HeapAttr::Field => Ok(quote_spanned! {self.field.span()=>
                 ::heapsz::HeapSize::heap_size(#ident)
             }),
             HeapAttr::FieldWith(ref meta, ref mod_path) => {
@@ -233,12 +243,9 @@ fn render_struct(input: DeriveInput) -> Result<proc_macro2::TokenStream> {
     };
     let fields = match data {
         DataStruct {
-            fields: Fields::Named(FieldsNamed { named: fields, .. }),
-            ..
-        } => fields.into_iter().collect(),
-        DataStruct {
             fields:
-                Fields::Unnamed(FieldsUnnamed {
+                Fields::Named(FieldsNamed { named: fields, .. })
+                | Fields::Unnamed(FieldsUnnamed {
                     unnamed: fields, ..
                 }),
             ..
@@ -327,7 +334,7 @@ fn render_enum_variant(var: Variant, container_attr: Option<&HeapAttr>) -> Resul
             let field_idents = fields
                 .iter()
                 .enumerate()
-                .map(|(i, f)| Ident::new(&format!("f_{}", i), f.span()))
+                .map(|(i, f)| Ident::new(&format!("f_{i}"), f.span()))
                 .collect::<Vec<_>>();
             let self_receivers = field_idents
                 .iter()
