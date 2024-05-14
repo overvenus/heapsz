@@ -14,7 +14,7 @@ bytes = ["dep:bytes"]
 protobuf2 = ["dep:protobuf2"]
 
 [dependencies]
-bytes = { version = "*", optional = true }
+bytes = { version = "1", optional = true }
 protobuf2 = { package = "protobuf", version = "2", optional = true }
 
 [dev-dependencies]
