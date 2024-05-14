@@ -17,7 +17,8 @@ jobs:
     timeout-minutes: 45
     steps:
       - uses: actions/checkout@v4
-      - uses: dtolnay/rust-toolchain@stable
+      - uses: dtolnay/rust-toolchain@1.78.0
+      - run: cargo fmt --check
       - run: cargo install cargo-expand@1.0.86
       - run: cargo test --all-features
 
