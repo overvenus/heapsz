@@ -74,7 +74,7 @@ impl ::heapsz::HeapSize for Unit {
         0
     }
 }
-pub struct Tuple1(#[heap_size] allowlisting::FullAllow);
+pub struct Tuple1(#[heap_size] pub allowlisting::FullAllow);
 impl ::heapsz::HeapSize for Tuple1 {
     fn heap_size(&self) -> usize {
         0 + ::heapsz::HeapSize::heap_size(&self.0)
@@ -82,9 +82,9 @@ impl ::heapsz::HeapSize for Tuple1 {
 }
 #[heap_size]
 pub struct Tuple2(
-    allowlisting::FullAllow,
+    pub allowlisting::FullAllow,
     #[heap_size(skip)]
-    allowlisting::PartialAllow,
+    pub allowlisting::PartialAllow,
 );
 impl ::heapsz::HeapSize for Tuple2 {
     fn heap_size(&self) -> usize {
