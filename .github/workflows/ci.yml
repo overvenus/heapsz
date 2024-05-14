@@ -18,6 +18,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@1.78.0
+        with:
+            components: rustfmt
       - run: cargo fmt --check
       - run: cargo install cargo-expand@1.0.86
       - run: cargo test --all-features
@@ -28,7 +30,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        rust: [stable, nightly]
+        rust: [stable, nightly, 1.78.0]
     timeout-minutes: 45
     steps:
       - uses: actions/checkout@v4
@@ -55,4 +57,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@clippy
+        with:
+            components: clippy
       - run: cargo clippy -- -Dclippy::all -Dclippy::pedantic
